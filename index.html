@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeporHuacho Pro | Sistema de Reservas y Gestión de Canchas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Outfit"', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            base: '#030706',
+                            card: '#0d1612',
+                            border: '#1b3026',
+                            green: '#00ff66',
+                            lime: '#d4ff00',
+                            cyan: '#00f2fe'
+                        }
+                    },
+                    boxShadow: {
+                        'neon-glow': '0 0 25px -5px rgba(0, 255, 102, 0.35)',
+                        'lime-glow': '0 0 25px -5px rgba(212, 255, 0, 0.35)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #030706;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Outfit', sans-serif;
+        }
+        .hero-mesh {
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 102, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(212, 255, 0, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 242, 254, 0.05) 0%, transparent 60%);
+        }
+        .glass-panel {
+            background: rgba(13, 22, 18, 0.88);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(27, 48, 38, 0.8);
+        }
+        .glass-panel-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-panel-hover:hover {
+            border-color: rgba(0, 255, 102, 0.5);
+            box-shadow: 0 10px 30px -10px rgba(0, 255, 102, 0.2);
+            transform: translateY(-4px);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030706;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1b3026;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff66;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#00ff66] selection:text-black">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-[#030706]/90 backdrop-blur-xl border-b border-[#1b3026]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#00ff66] to-[#d4ff00] flex items-center justify-center text-black font-black text-xl shadow-neon-glow group-hover:scale-105 transition">
+                    <i class="fa-solid fa-futbol"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-black font-display tracking-tight text-white">Depor<span class="text-[#00ff66]">Huacho</span></span>
+                    <span class="text-[10px] tracking-widest text-[#d4ff00] font-bold uppercase -mt-1">Huacho • Pro</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-300">
+                <a href="#inicio" class="hover:text-[#00ff66] transition">Inicio</a>
+                <a href="#canchas" class="hover:text-[#00ff66] transition">Complejos</a>
+                <button onclick="scrollToPanel()" class="text-[#d4ff00] hover:underline flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> Portal de Dueños</button>
+            </nav>
+
+            <!-- Actions / Auth Badges -->
+            <div class="flex items-center gap-3">
+                <div id="customerSessionBadge" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] text-xs font-bold">
+                    <i class="fa-solid fa-user"></i> <span id="navCustomerName">Cliente</span>
+                    <button onclick="logoutCustomer()" class="ml-2 text-slate-400 hover:text-white" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+
+                <div id="ownerSessionBadge" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl bg-[#d4ff00]/10 border border-[#d4ff00]/30 text-[#d4ff00] text-xs font-bold">
+                    <i class="fa-solid fa-shield-halved"></i> <span id="navOwnerName">Dueño</span>
+                    <button onclick="logoutOwner()" class="ml-2 text-slate-400 hover:text-white" title="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+
+                <div id="authButtonsGroup" class="flex items-center gap-2">
+                    <button onclick="openAuthModal('login')" class="text-slate-300 hover:text-white text-sm font-bold px-4 py-2">Ingresar</button>
+                    <button onclick="openAuthModal('register')" class="bg-gradient-to-r from-[#00ff66] to-[#d4ff00] text-black text-sm font-extrabold px-4 py-2.5 rounded-xl hover:opacity-95 transition shadow-neon-glow">
+                        Registrarse
+                    </button>
+                </div>
+
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 text-2xl p-2">
+                    <i class="fa-solid fa-bars" id="menuIcon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-[#0d1612] border-b border-[#1b3026] px-6 py-6 space-y-4">
+            <a href="#inicio" onclick="toggleMobileMenu()" class="block text-slate-200 font-medium hover:text-[#00ff66]">Inicio</a>
+            <a href="#canchas" onclick="toggleMobileMenu()" class="block text-slate-200 font-medium hover:text-[#00ff66]">Complejos</a>
+            <button onclick="scrollToPanel(); toggleMobileMenu();" class="w-full text-left py-2 text-[#d4ff00] font-bold"><i class="fa-solid fa-shield-halved mr-1"></i> Portal de Dueños</button>
+            <div id="mobileAuthArea" class="pt-4 border-t border-[#1b3026] space-y-2">
+                <button onclick="openAuthModal('login'); toggleMobileMenu();" class="w-full py-2.5 rounded-xl bg-[#1b3026] text-white font-bold text-xs">Iniciar Sesión</button>
+                <button onclick="openAuthModal('register'); toggleMobileMenu();" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#00ff66] to-[#d4ff00] text-black font-extrabold text-xs">Registrarse</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section id="inicio" class="relative pt-32 pb-24 lg:pt-44 lg:pb-36 hero-mesh overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <div class="lg:col-span-7 space-y-8 text-left">
+                    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] text-xs font-bold uppercase tracking-widest shadow-neon-glow">
+                        <i class="fa-solid fa-bolt animate-bounce"></i> Sistema Oficial de Reservas en Huacho y Santa María
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black font-display text-white tracking-tight leading-[1.08]">
+                        Reserva Horas y Paga con <span class="bg-gradient-to-r from-[#00ff66] to-[#d4ff00] bg-clip-text text-transparent">Yape, Plin o Efectivo</span>.
+                    </h1>
+                    
+                    <p class="text-base sm:text-lg text-slate-300 font-normal max-w-2xl leading-relaxed">
+                        Selecciona múltiples bloques horarios en tiempo real, elige tu método de pago preferido y asegura tu cancha al instante.
+                    </p>
+
+                    <!-- Search Box -->
+                    <div class="glass-panel rounded-2xl p-4 sm:p-5 shadow-2xl border-[#1b3026]">
+                        <form id="heroSearchForm" onsubmit="handleHeroSearch(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+                            <div class="space-y-1">
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-map-pin text-[#00ff66] mr-1"></i> Sector</label>
+                                <select id="searchZona" class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs sm:text-sm text-white focus:outline-none focus:border-[#00ff66]">
+                                    <option value="todos">Todos los sectores</option>
+                                    <option value="centro">Centro / Macnamara</option>
+                                    <option value="santa-maria">Santa María / Av. Perú</option>
+                                    <option value="salaverry">Av. Salaverry</option>
+                                    <option value="amay">Sector Amay</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-futbol text-[#d4ff00] mr-1"></i> Tipo</label>
+                                <select id="searchTipo" class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs sm:text-sm text-white focus:outline-none focus:border-[#00ff66]">
+                                    <option value="todos">Cualquier tipo</option>
+                                    <option value="sintetico">Grass Sintético Pro</option>
+                                    <option value="multiuso">Multiuso / Eventos</option>
+                                </select>
+                            </div>
+                            <div class="pt-5 sm:pt-0">
+                                <button type="submit" class="w-full bg-gradient-to-r from-[#00ff66] to-[#d4ff00] text-black font-extrabold py-3.5 px-4 rounded-xl hover:opacity-95 transition shadow-neon-glow flex items-center justify-center gap-2 text-sm">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Buscar Cancha
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 pt-4 border-t border-[#1b3026]">
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-black font-display text-white" id="statTotalComplex">0</div>
+                            <div class="text-xs text-slate-400">Complejos Top</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-black font-display text-[#00ff66]">S/ 60</div>
+                            <div class="text-xs text-slate-400">Tarifa Promedio</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-black font-display text-[#d4ff00]">Yape / Plin</div>
+                            <div class="text-xs text-slate-400">Pagos Seguros</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Visual -->
+                <div class="lg:col-span-5 relative">
+                    <div class="absolute -inset-2 bg-gradient-to-r from-[#00ff66] to-[#d4ff00] opacity-20 blur-2xl rounded-3xl"></div>
+                    <div class="glass-panel rounded-3xl p-6 relative border border-[#1b3026] space-y-6 shadow-2xl">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-3 h-3 rounded-full bg-[#00ff66] animate-ping"></div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-[#00ff66]">Pagos Flexibles</span>
+                            </div>
+                            <span class="text-xs text-slate-400 font-mono">Modo Pro</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-[#030706] p-4 rounded-2xl border border-[#1b3026] flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-mobile-screen-button"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white">Yape o Plin</h4>
+                                        <p class="text-[11px] text-slate-400">Transferencia digital directa</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-purple-500/10 text-purple-300 px-2.5 py-1 rounded-full font-bold">Digital</span>
+                            </div>
+
+                            <div class="bg-[#030706] p-4 rounded-2xl border border-[#1b3026] flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-[#00ff66] flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-money-bill-wave"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white">Pago en Efectivo</h4>
+                                        <p class="text-[11px] text-slate-400">Paga al llegar al complejo</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] bg-[#00ff66]/10 text-[#00ff66] px-2.5 py-1 rounded-full font-bold">Presencial</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <a href="#canchas" class="w-full py-3.5 rounded-xl bg-[#1b3026] hover:bg-[#00ff66] hover:text-black text-white font-bold text-xs uppercase tracking-wider transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrow-down"></i> Ver Complejos y Reservar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: COMPLEXES CONTAINER -->
+    <section id="canchas" class="py-24 bg-[#050b08] border-t border-[#1b3026]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-14">
+                <div>
+                    <span class="text-[#00ff66] text-xs font-black uppercase tracking-widest bg-[#00ff66]/10 px-3 py-1 rounded-full">Recintos Verificados</span>
+                    <h2 class="text-3xl sm:text-5xl font-black font-display text-white mt-3">Complejos Deportivos</h2>
+                    <p class="text-slate-400 text-sm mt-2">Selecciona tu recinto favorito para elegir múltiples horarios y método de pago.</p>
+                </div>
+                <!-- Filter Pills -->
+                <div class="mt-6 md:mt-0 flex flex-wrap gap-2">
+                    <button onclick="filterComplejos('todos')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#00ff66] text-black transition">Todos</button>
+                    <button onclick="filterComplejos('centro')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#0d1612] text-slate-300 hover:text-white border border-[#1b3026] transition">Centro</button>
+                    <button onclick="filterComplejos('santa-maria')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#0d1612] text-slate-300 hover:text-white border border-[#1b3026] transition">Santa María</button>
+                    <button onclick="filterComplejos('salaverry')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#0d1612] text-slate-300 hover:text-white border border-[#1b3026] transition">Salaverry</button>
+                    <button onclick="filterComplejos('amay')" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#0d1612] text-slate-300 hover:text-white border border-[#1b3026] transition">Amay</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Grid for Complexes (Zero hardcoded placeholders) -->
+            <div id="complejosGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Loaded dynamically via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: PORTAL DE DUEÑOS -->
+    <section id="portalDueños" class="py-24 bg-[#030706] border-t border-[#1b3026]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto glass-panel rounded-3xl p-8 sm:p-12 border border-[#1b3026] relative overflow-hidden shadow-2xl">
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-[#d4ff00]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="text-center space-y-3 mb-8">
+                    <span class="px-3 py-1 rounded-full bg-[#d4ff00]/10 text-[#d4ff00] font-bold text-xs uppercase tracking-widest"><i class="fa-solid fa-shield-halved mr-1"></i> Panel de Propietarios</span>
+                    <h2 class="text-3xl sm:text-4xl font-black font-display text-white">Gestión de Local y Bloqueo de Horas</h2>
+                    <p class="text-sm text-slate-400">Ingresa con tu contraseña única para administrar tu número telefónico, ver reservas y bloquear horas apartadas en persona.</p>
+                </div>
+
+                <!-- Login Form for Owners -->
+                <div id="ownerLoginForm" class="space-y-5 max-w-lg mx-auto">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2"><i class="fa-solid fa-building text-[#d4ff00] mr-1"></i> Selecciona tu Complejo</label>
+                        <select id="ownerSelectComplejo" class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-[#d4ff00]">
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2"><i class="fa-solid fa-key text-[#d4ff00] mr-1"></i> Contraseña Secreta del Local</label>
+                        <input type="password" id="ownerSecretInput" placeholder="Introduce la clave asignada a tu local" class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-[#d4ff00]">
+                        <p class="text-[11px] text-slate-500 mt-1">Claves por defecto: <strong>1010</strong> para todos los recintos registrados.</p>
+                    </div>
+
+                    <button onclick="loginOwnerPortal()" class="w-full bg-gradient-to-r from-[#d4ff00] to-[#00ff66] text-black font-extrabold py-4 rounded-xl hover:opacity-95 transition shadow-lime-glow text-sm flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> Ingresar al Panel del Local
+                    </button>
+                </div>
+
+                <!-- Dashboard Content (Initially Hidden) -->
+                <div id="ownerDashboardContent" class="hidden space-y-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#1b3026]">
+                        <div>
+                            <span class="text-xs text-[#d4ff00] font-bold uppercase tracking-wider">Administrando</span>
+                            <h3 id="dashboardOwnerTitle" class="text-2xl font-bold font-display text-white">Nombre del Complejo</h3>
+                        </div>
+                        <button onclick="logoutOwner()" class="px-4 py-2 rounded-xl bg-[#1b3026] text-slate-300 hover:text-white text-xs font-bold self-start sm:self-auto"><i class="fa-solid fa-right-from-bracket mr-1"></i> Cerrar Sesión</button>
+                    </div>
+
+                    <!-- Owner Settings: Change Phone Number -->
+                    <div class="bg-[#030706] p-6 rounded-2xl border border-[#1b3026] space-y-4">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-phone text-[#d4ff00] mr-1"></i> Configurar Número de Contacto / WhatsApp del Local</h4>
+                        <div class="flex gap-3">
+                            <input type="tel" id="ownerPhoneInput" placeholder="Ej. 999888777" class="flex-1 bg-[#0d1612] border border-[#1b3026] rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#d4ff00]">
+                            <button onclick="saveOwnerPhone()" class="bg-[#d4ff00] text-black font-extrabold px-6 py-3 rounded-xl hover:opacity-95 text-xs transition">Guardar Teléfono</button>
+                        </div>
+                    </div>
+
+                    <!-- Owner Tool: Block Manual Hours (Persona) -->
+                    <div class="bg-[#030706] p-6 rounded-2xl border border-[#1b3026] space-y-4">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-ban text-rose-400 mr-1"></i> Bloquear Hora Manual (Reserva en Persona / Llamada)</h4>
+                        <p class="text-xs text-slate-400">Si un cliente alquiló directamente en tu local o por llamada, bloquea el turno para que nadie lo pueda reservar por internet.</p>
+                        <form onsubmit="blockManualHour(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Fecha</label>
+                                <input type="date" id="blockDate" required class="w-full bg-[#0d1612] border border-[#1b3026] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4ff00]">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-400 mb-1">Hora a Bloquear</label>
+                                <select id="blockHour" required class="w-full bg-[#0d1612] border border-[#1b3026] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4ff00]">
+                                    <option value="17:00 - 18:00">17:00 - 18:00 hrs</option>
+                                    <option value="18:00 - 19:00">18:00 - 19:00 hrs</option>
+                                    <option value="19:00 - 20:00">19:00 - 20:00 hrs</option>
+                                    <option value="20:00 - 21:00">20:00 - 21:00 hrs</option>
+                                    <option value="21:00 - 22:00">21:00 - 22:00 hrs</option>
+                                    <option value="22:00 - 23:00">22:00 - 23:00 hrs</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="submit" class="w-full bg-rose-500/20 border border-rose-500/40 text-rose-300 font-extrabold py-2.5 rounded-xl hover:bg-rose-500 hover:text-black text-xs transition">
+                                    <i class="fa-solid fa-lock mr-1"></i> Bloquear Turno
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-[#030706] p-4 rounded-2xl border border-[#1b3026]">
+                            <span class="text-xs text-slate-400">Total Reservas</span>
+                            <div id="dashTotalRes" class="text-2xl font-black font-display text-white mt-1">0</div>
+                        </div>
+                        <div class="bg-[#030706] p-4 rounded-2xl border border-[#1b3026]">
+                            <span class="text-xs text-slate-400">Ingresos Estimados</span>
+                            <div id="dashTotalIngresos" class="text-2xl font-black font-display text-[#00ff66] mt-1">S/ 0</div>
+                        </div>
+                        <div class="bg-[#030706] p-4 rounded-2xl border border-[#1b3026]">
+                            <span class="text-xs text-slate-400">Estado Local</span>
+                            <div class="text-sm font-bold text-[#d4ff00] mt-1 flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#d4ff00] animate-pulse"></span> Sincronizado</div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider"><i class="fa-solid fa-users text-[#d4ff00] mr-1"></i> Listado de Turnos y Métodos de Pago</h4>
+                        <div id="ownerReservationsList" class="space-y-2 max-h-64 overflow-y-auto pr-2">
+                            <div class="text-xs text-slate-500 py-4 text-center">No hay reservas registradas aún.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#020504] border-t border-[#1b3026] py-12 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-[#00ff66] flex items-center justify-center text-black font-bold">
+                    <i class="fa-solid fa-futbol text-xs"></i>
+                </div>
+                <span class="text-white font-bold text-sm font-display">DeporHuacho Pro</span>
+            </div>
+            <p class="text-center md:text-left">© 2026 DeporHuacho Pro. Sistema de Reservas y Gestión de Canchas.</p>
+            <div class="flex items-center gap-4">
+                <a href="#inicio" class="hover:text-[#00ff66]">Inicio</a>
+                <a href="#canchas" class="hover:text-[#00ff66]">Complejos</a>
+                <button onclick="scrollToPanel()" class="hover:text-[#d4ff00]">Portal Dueños</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL: BOOKING -->
+    <div id="bookingModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-[#1b3026] relative space-y-6 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeBookingModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div>
+                <span class="text-xs font-bold text-[#00ff66] uppercase tracking-wider" id="modalComplexZona">Reserva de Cancha</span>
+                <h3 id="modalComplexName" class="text-2xl font-bold font-display text-white mt-1">Nombre Complejo</h3>
+                <p id="modalComplexAddress" class="text-xs text-slate-400 mt-0.5">Dirección</p>
+            </div>
+
+            <form id="bookingForm" onsubmit="submitBooking(event)" class="space-y-4">
+                <input type="hidden" id="bookingComplexId">
+                <input type="hidden" id="bookingComplexPrice">
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Fecha de Reserva</label>
+                    <input type="date" id="bookingDate" onchange="renderAvailableHours()" required class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-[#00ff66]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2"><i class="fa-solid fa-clock text-[#00ff66] mr-1"></i> Selecciona Horas (Puedes marcar varias)</label>
+                    <div id="hoursCheckboxContainer" class="grid grid-cols-2 gap-2.5 max-h-40 overflow-y-auto pr-1">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">Tu Nombre</label>
+                        <input type="text" id="bookingClientName" placeholder="Nombre y apellido" required class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-[#00ff66]">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-1">WhatsApp</label>
+                        <input type="tel" id="bookingClientPhone" placeholder="999 999 999" required class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-[#00ff66]">
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2"><i class="fa-solid fa-wallet text-[#d4ff00] mr-1"></i> Método de Pago</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="bg-[#030706] border border-[#1b3026] hover:border-[#00ff66] p-3 rounded-xl flex items-center gap-3 cursor-pointer transition">
+                            <input type="radio" name="paymentMethod" value="Yape / Plin" checked class="accent-[#00ff66]">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Yape / Plin</span>
+                                <span class="text-[10px] text-slate-400">Pago digital</span>
+                            </div>
+                        </label>
+                        <label class="bg-[#030706] border border-[#1b3026] hover:border-[#00ff66] p-3 rounded-xl flex items-center gap-3 cursor-pointer transition">
+                            <input type="radio" name="paymentMethod" value="Efectivo" class="accent-[#00ff66]">
+                            <div>
+                                <span class="text-xs font-bold text-white block">Efectivo</span>
+                                <span class="text-[10px] text-slate-400">Pago en local</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-[#030706] p-4 rounded-xl border border-[#1b3026] flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Total a pagar:</span>
+                        <span id="modalSelectedHoursCount" class="text-[11px] text-slate-500">0 horas seleccionadas</span>
+                    </div>
+                    <span id="modalDisplayTotalPrice" class="text-lg font-black text-[#00ff66]">S/ 0</span>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-[#00ff66] to-[#d4ff00] text-black font-extrabold py-3.5 rounded-xl hover:opacity-95 transition shadow-neon-glow text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check"></i> Confirmar Reserva Múltiple
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: AUTH -->
+    <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-3xl p-6 sm:p-8 border border-[#1b3026] relative space-y-6">
+            <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            
+            <div class="text-center">
+                <h3 id="authModalTitle" class="text-2xl font-bold font-display text-white">Iniciar Sesión</h3>
+                <p id="authModalSub" class="text-xs text-slate-400 mt-1">Accede a tu cuenta de cliente</p>
+            </div>
+
+            <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="authNameGroup" class="hidden">
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Nombre Completo</label>
+                    <input type="text" id="authName" placeholder="Tu nombre" class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-[#00ff66]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Correo Electrónico</label>
+                    <input type="email" id="authEmail" placeholder="correo@ejemplo.com" required class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-[#00ff66]">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1">Contraseña</label>
+                    <input type="password" id="authPassword" placeholder="••••••••" required class="w-full bg-[#030706] border border-[#1b3026] rounded-xl px-3.5 py-3 text-xs text-white focus:outline-none focus:border-[#00ff66]">
+                </div>
+
+                <button type="submit" id="authSubmitBtn" class="w-full bg-gradient-to-r from-[#00ff66] to-[#d4ff00] text-black font-extrabold py-3.5 rounded-xl hover:opacity-95 transition shadow-neon-glow text-xs flex items-center justify-center gap-2">
+                    Ingresar
+                </button>
+            </form>
+
+            <div class="text-center pt-2 border-t border-[#1b3026]">
+                <p id="authToggleText" class="text-xs text-slate-400">¿No tienes cuenta? <button onclick="switchAuthMode()" class="text-[#00ff66] font-bold hover:underline">Regístrate aquí</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // CLEAN CONFIGURABLE DATABASE (Sin complejos hardcodeados, lista limpia)
+        let complejosData = [];
+
+        let appState = {
+            currentUser: null,
+            reservations: [],
+            authMode: 'login'
+        };
+
+        const availableHoursList = [
+            '17:00 - 18:00',
+            '18:00 - 19:00',
+            '19:00 - 20:00',
+            '20:00 - 21:00',
+            '21:00 - 22:00',
+            '22:00 - 23:00'
+        ];
+
+        // Initialize dynamic rendering on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderComplejos(complejosData);
+            populateOwnerSelect();
+            document.getElementById('statTotalComplex').innerText = complejosData.length;
+        });
+
+        function renderComplejos(data) {
+            const grid = document.getElementById('complejosGrid');
+            if (data.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-16 text-center space-y-3"><div class="text-slate-500 text-sm">No hay complejos deportivos registrados actualmente.</div><p class="text-xs text-slate-600">Los campos ficticios anteriores han sido retirados por completo.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = data.map(c => `
+                <div class="glass-panel glass-panel-hover rounded-3xl overflow-hidden flex flex-col justify-between complex-card" data-zona="${c.zona}" data-tipo="${c.tipo}" data-cancha-id="${c.id}">
+                    <div>
+                        <div class="relative h-56 bg-slate-900 overflow-hidden">
+                            <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/0d1612/00ff66?text=Recinto'">
+                            <div class="absolute top-4 left-4 bg-black/80 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-[#00ff66] border border-[#00ff66]/30">
+                                <i class="fa-solid fa-location-dot mr-1"></i> ${c.zonaLabel}
+                            </div>
+                            <div class="absolute top-4 right-4 bg-[#00ff66] text-black px-3 py-1 rounded-full text-xs font-black uppercase">
+                                S/ ${c.price} / hora
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <h3 class="text-2xl font-bold font-display text-white">${c.name}</h3>
+                                <p class="text-xs text-slate-400 mt-1">${c.desc}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6 pt-0">
+                        <button onclick="openBookingModal('${c.id}', '${c.name.replace(/'/g, "\\'")}', ${c.price}, '${c.zonaLabel}')" class="w-full bg-gradient-to-r from-[#00ff66] to-[#d4ff00] text-black font-extrabold py-3.5 rounded-xl hover:opacity-95 transition shadow-neon-glow text-xs flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-calendar-check text-sm"></i> Ver Horarios y Reservar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateOwnerSelect() {
+            const select = document.getElementById('ownerSelectComplejo');
+            if (complejosData.length === 0) {
+                select.innerHTML = `<option value="">No hay recintos disponibles</option>`;
+                return;
+            }
+            select.innerHTML = complejosData.map(c => `
+                <option value="${c.id}">${c.name} (${c.zonaLabel})</option>
+            `).join('');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+            const icon = document.getElementById('menuIcon');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-xmark');
+        }
+
+        function scrollToPanel() {
+            document.getElementById('portalDueños').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function filterComplejos(zona) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = "filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#0d1612] text-slate-300 hover:text-white border border-[#1b3026] transition";
+            });
+            event.target.className = "filter-btn px-4 py-2 rounded-xl text-xs font-bold bg-[#00ff66] text-black transition";
+
+            const cards = document.querySelectorAll('.complex-card');
+            cards.forEach(card => {
+                if(zona === 'todos' || card.getAttribute('data-zona') === zona) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function handleHeroSearch(e) {
+            e.preventDefault();
+            const zona = document.getElementById('searchZona').value;
+            const tipo = document.getElementById('searchTipo').value;
+
+            document.getElementById('canchas').scrollIntoView({ behavior: 'smooth' });
+
+            const cards = document.querySelectorAll('.complex-card');
+            cards.forEach(card => {
+                const matchZona = zona === 'todos' || card.getAttribute('data-zona') === zona;
+                const matchTipo = tipo === 'todos' || card.getAttribute('data-tipo') === tipo;
+                if(matchZona && matchTipo) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        function openBookingModal(id, name, price, address) {
+            document.getElementById('bookingComplexId').value = id;
+            document.getElementById('bookingComplexPrice').value = price;
+            document.getElementById('modalComplexName').innerText = name;
+            document.getElementById('modalComplexAddress').innerText = address;
+            
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('bookingDate').value = tomorrow.toISOString().split('T')[0];
+
+            if(appState.currentUser && appState.currentUser.type === 'customer') {
+                document.getElementById('bookingClientName').value = appState.currentUser.name;
+            }
+
+            renderAvailableHours();
+            document.getElementById('bookingModal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.add('hidden');
+        }
+
+        function renderAvailableHours() {
+            const complexId = document.getElementById('bookingComplexId').value;
+            const date = document.getElementById('bookingDate').value;
+            const container = document.getElementById('hoursCheckboxContainer');
+
+            const bookedHoursOnDate = appState.reservations
+                .filter(r => r.complexId === complexId && r.date === date)
+                .map(r => r.hour);
+
+            container.innerHTML = availableHoursList.map(hour => {
+                const isBooked = bookedHoursOnDate.includes(hour);
+                if(isBooked) {
+                    return `
+                        <div class="bg-[#030706] border border-rose-500/30 p-2.5 rounded-xl flex items-center justify-between text-xs opacity-50 cursor-not-allowed">
+                            <span class="text-rose-400 font-medium line-through">${hour} hrs</span>
+                            <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold">Ocupado</span>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <label class="bg-[#030706] border border-[#1b3026] hover:border-[#00ff66] p-2.5 rounded-xl flex items-center justify-between text-xs cursor-pointer transition">
+                            <span class="text-white font-medium">${hour} hrs</span>
+                            <input type="checkbox" name="selectedHours" value="${hour}" onchange="updateTotalPrice()" class="w-4 h-4 accent-[#00ff66] rounded">
+                        </label>
+                    `;
+                }
+            }).join('');
+
+            updateTotalPrice();
+        }
+
+        function updateTotalPrice() {
+            const price = parseFloat(document.getElementById('bookingComplexPrice').value) || 0;
+            const checkboxes = document.querySelectorAll('input[name="selectedHours"]:checked');
+            const count = checkboxes.length;
+            const total = count * price;
+
+            document.getElementById('modalSelectedHoursCount').innerText = `${count} hora${count === 1 ? '' : 's'} seleccionada${count === 1 ? '' : 's'}`;
+            document.getElementById('modalDisplayTotalPrice').innerText = `S/ ${total}`;
+        }
+
+        function submitBooking(e) {
+            e.preventDefault();
+            const complexId = document.getElementById('bookingComplexId').value;
+            const complexName = document.getElementById('modalComplexName').innerText;
+            const date = document.getElementById('bookingDate').value;
+            const clientName = document.getElementById('bookingClientName').value;
+            const phone = document.getElementById('bookingClientPhone').value;
+            const price = parseFloat(document.getElementById('bookingComplexPrice').value);
+            
+            const paymentMethodInput = document.querySelector('input[name="paymentMethod"]:checked');
+            const paymentMethod = paymentMethodInput ? paymentMethodInput.value : 'Efectivo';
+
+            const checkboxes = document.querySelectorAll('input[name="selectedHours"]:checked');
+            if(checkboxes.length === 0) {
+                alert('Por favor selecciona al menos una hora.');
+                return;
+            }
+
+            checkboxes.forEach(cb => {
+                const newReservation = {
+                    id: Date.now() + Math.random(),
+                    complexId,
+                    complexName,
+                    date,
+                    hour: cb.value,
+                    clientName,
+                    phone,
+                    price,
+                    type: 'web',
+                    paymentMethod
+                };
+                appState.reservations.push(newReservation);
+            });
+
+            const complexObj = complejosData.find(c => c.id === complexId);
+            const localPhone = complexObj ? complexObj.phone : '999999999';
+            let successMsg = `¡Reserva múltiple confirmada con éxito en ${complexName}!\nMétodo de pago: ${paymentMethod}.`;
+            if(paymentMethod === 'Yape / Plin') {
+                successMsg += `\nRecuerda yapear al número del local (${localPhone}) y enviar tu comprobante por WhatsApp.`;
+            }
+
+            alert(successMsg);
+            closeBookingModal();
+            document.getElementById('bookingForm').reset();
+        }
+
+        function openAuthModal(mode) {
+            appState.authMode = mode;
+            const title = document.getElementById('authModalTitle');
+            const sub = document.getElementById('authModalSub');
+            const nameGroup = document.getElementById('authNameGroup');
+            const btn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('authToggleText');
+
+            if(mode === 'login') {
+                title.innerText = "Iniciar Sesión";
+                sub.innerText = "Accede a tu cuenta de cliente";
+                nameGroup.classList.add('hidden');
+                document.getElementById('authName').removeAttribute('required');
+                btn.innerText = "Ingresar";
+                toggleText.innerHTML = `¿No tienes cuenta? <button type="button" onclick="switchAuthMode()" class="text-[#00ff66] font-bold hover:underline">Regístrate aquí</button>`;
+            } else {
+                title.innerText = "Registro de Cliente";
+                sub.innerText = "Crea tu cuenta para guardar reservas";
+                nameGroup.classList.remove('hidden');
+                document.getElementById('authName').setAttribute('required', 'true');
+                btn.innerText = "Registrarse";
+                toggleText.innerHTML = `¿Ya tienes cuenta? <button type="button" onclick="switchAuthMode()" class="text-[#00ff66] font-bold hover:underline">Inicia sesión</button>`;
+            }
+
+            document.getElementById('authModal').classList.remove('hidden');
+        }
+
+        function closeAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+        }
+
+        function switchAuthMode() {
+            openAuthModal(appState.authMode === 'login' ? 'register' : 'login');
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value;
+            const name = appState.authMode === 'register' ? document.getElementById('authName').value : (email.split('@')[0]);
+
+            appState.currentUser = {
+                name: name.charAt(0).toUpperCase() + name.slice(1),
+                email,
+                type: 'customer'
+            };
+
+            updateAuthUI();
+            closeAuthModal();
+            alert(`¡Bienvenido, ${appState.currentUser.name}!`);
+        }
+
+        function logoutCustomer() {
+            appState.currentUser = null;
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const customerBadge = document.getElementById('customerSessionBadge');
+            const ownerBadge = document.getElementById('ownerSessionBadge');
+            const authButtons = document.getElementById('authButtonsGroup');
+
+            if(appState.currentUser && appState.currentUser.type === 'customer') {
+                customerBadge.classList.remove('hidden');
+                customerBadge.classList.add('flex');
+                document.getElementById('navCustomerName').innerText = appState.currentUser.name;
+                authButtons.classList.add('hidden');
+            } else if(appState.currentUser && appState.currentUser.type === 'owner') {
+                ownerBadge.classList.remove('hidden');
+                ownerBadge.classList.add('flex');
+                document.getElementById('navOwnerName').innerText = `${appState.currentUser.complexName} (Dueño)`;
+                authButtons.classList.add('hidden');
+            } else {
+                customerBadge.classList.add('hidden');
+                customerBadge.classList.remove('flex');
+                ownerBadge.classList.add('hidden');
+                ownerBadge.classList.remove('flex');
+                authButtons.classList.remove('hidden');
+            }
+        }
+
+        function loginOwnerPortal() {
+            const complexId = document.getElementById('ownerSelectComplejo').value;
+            const secret = document.getElementById('ownerSecretInput').value.trim();
+            const complexObj = complejosData.find(c => c.id === complexId);
+
+            if(complexObj && secret === complexObj.password) {
+                appState.currentUser = {
+                    name: 'Dueño',
+                    type: 'owner',
+                    complexId,
+                    complexName: complexObj.name
+                };
+
+                updateAuthUI();
+                renderOwnerDashboard(complexId, complexObj.name);
+            } else {
+                alert('Selecciona un complejo válido e introduce la clave correcta.');
+            }
+        }
+
+        function renderOwnerDashboard(complexId, complexName) {
+            document.getElementById('ownerLoginForm').classList.add('hidden');
+            document.getElementById('ownerDashboardContent').classList.remove('hidden');
+            document.getElementById('dashboardOwnerTitle').innerText = complexName;
+
+            const complexObj = complejosData.find(c => c.id === complexId);
+            document.getElementById('ownerPhoneInput').value = complexObj ? complexObj.phone : '';
+
+            const complexReservations = appState.reservations.filter(r => r.complexId === complexId);
+            
+            document.getElementById('dashTotalRes').innerText = complexReservations.length;
+            
+            const totalIngresos = complexReservations.reduce((acc, curr) => acc + curr.price, 0);
+            document.getElementById('dashTotalIngresos').innerText = `S/ ${totalIngresos}`;
+
+            const listContainer = document.getElementById('ownerReservationsList');
+            if(complexReservations.length === 0) {
+                listContainer.innerHTML = `<div class="text-xs text-slate-500 py-4 text-center">No hay reservas registradas aún para este local.</div>`;
+            } else {
+                listContainer.innerHTML = complexReservations.map(r => `
+                    <div class="bg-[#030706] p-3.5 rounded-xl border border-[#1b3026] flex items-center justify-between text-xs">
+                        <div>
+                            <span class="font-bold text-white"><i class="fa-solid fa-user text-[#d4ff00] mr-1"></i> ${r.clientName}</span>
+                            <div class="text-[11px] text-slate-400 mt-0.5"><i class="fa-regular fa-calendar mr-1"></i> ${r.date} | ${r.hour}</div>
+                            <div class="text-[10px] text-slate-500 mt-0.5"><i class="fa-solid fa-phone mr-1"></i> WhatsApp: ${r.phone} | Pago: <strong class="text-white">${r.paymentMethod || 'Efectivo'}</strong></div>
+                        </div>
+                        <div class="text-right flex flex-col items-end gap-1">
+                            <span class="font-black text-[#00ff66]">S/ ${r.price}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-bold ${r.type === 'manual' ? 'bg-rose-500/20 text-rose-300' : 'bg-[#00ff66]/10 text-[#00ff66]'}">
+                                ${r.type === 'manual' ? 'Bloqueo en Persona' : 'Confirmada Web'}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function saveOwnerPhone() {
+            if(!appState.currentUser || appState.currentUser.type !== 'owner') return;
+            const complexId = appState.currentUser.complexId;
+            const newPhone = document.getElementById('ownerPhoneInput').value.trim();
+
+            if(!newPhone) {
+                alert('Ingresa un número válido.');
+                return;
+            }
+
+            const complexObj = complejosData.find(c => c.id === complexId);
+            if(complexObj) {
+                complexObj.phone = newPhone;
+            }
+
+            alert(`¡Número de contacto actualizado con éxito a: ${newPhone}!`);
+        }
+
+        function blockManualHour(e) {
+            e.preventDefault();
+            if(!appState.currentUser || appState.currentUser.type !== 'owner') return;
+            
+            const complexId = appState.currentUser.complexId;
+            const complexName = appState.currentUser.complexName;
+            const date = document.getElementById('blockDate').value;
+            const hour = document.getElementById('blockHour').value;
+
+            const exists = appState.reservations.some(r => r.complexId === complexId && r.date === date && r.hour === hour);
+            if(exists) {
+                alert('Este horario ya se encuentra ocupado o bloqueado.');
+                return;
+            }
+
+            const manualBlock = {
+                id: Date.now(),
+                complexId,
+                complexName,
+                date,
+                hour,
+                clientName: '🔒 Reservado en Persona / Local',
+                phone: 'N/A (Presencial)',
+                price: 0,
+                type: 'manual',
+                paymentMethod: 'Presencial'
+            };
+
+            appState.reservations.push(manualBlock);
+            alert(`¡Turno ${hour} del día ${date} bloqueado exitosamente! Ahora aparecerá inhabilitado en la web.`);
+            renderOwnerDashboard(complexId, complexName);
+        }
+
+        function logoutOwner() {
+            appState.currentUser = null;
+            document.getElementById('ownerDashboardContent').classList.add('hidden');
+            document.getElementById('ownerLoginForm').classList.remove('hidden');
+            document.getElementById('ownerSecretInput').value = '';
+            updateAuthUI();
+        }
+    </script>
+</body>
+</html>
