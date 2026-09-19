@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeporHuacho Pro - Alquiler de Canchas Sintéticas</title>
-    <!-- Tu logo oficial -->
     <link rel="icon" href="logo.png.ico">
     <link rel="apple-touch-icon" href="logo.png.ico">
     
     <style>
         :root {
-            --bg-color: #030706;
-            --card-bg: rgba(10, 20, 15, 0.85);
+            --bg-color: #020604;
+            --card-bg: rgba(6, 16, 11, 0.85);
             --neon-green: #00ff66;
-            --neon-glow: rgba(0, 255, 102, 0.4);
+            --neon-glow: rgba(0, 255, 102, 0.5);
             --text-main: #ffffff;
             --text-muted: #a0aec0;
-            --border-color: rgba(0, 255, 102, 0.3);
+            --border-color: rgba(0, 255, 102, 0.35);
         }
 
         * {
@@ -26,11 +25,42 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* FONDO DINÁMICO CON LÍNEAS / RAYAS VERDES EN MOVIMIENTO Y CUADRÍCULAS */
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
-            background-image: radial-gradient(circle at 50% 10%, rgba(0, 255, 102, 0.08) 0%, transparent 60%);
+            position: relative;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 255, 102, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Efecto de líneas / destellos verdes animados cruzando el fondo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent 45%, 
+                rgba(0, 255, 102, 0.04) 50%, 
+                transparent 55%
+            );
+            transform: rotate(25deg);
+            animation: backgroundLaser 12s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundLaser {
+            0% { transform: translateY(-100%) rotate(25deg); }
+            100% { transform: translateY(100%) rotate(25deg); }
         }
 
         /* Barra de Navegación */
@@ -39,12 +69,13 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 5%;
-            background: rgba(3, 7, 6, 0.95);
+            background: rgba(2, 8, 5, 0.95);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 1000;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
         }
 
         .logo-area {
@@ -55,79 +86,89 @@
         }
 
         .logo-area img {
-            width: 40px;
-            height: 40px;
+            width: 42px;
+            height: 42px;
             border-radius: 8px;
             border: 1px solid var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-glow);
+            box-shadow: 0 0 12px var(--neon-glow);
         }
 
         .logo-area h1 {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             letter-spacing: 1px;
             color: var(--text-main);
         }
 
         .logo-area h1 span {
             color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-glow);
         }
 
         .admin-btn {
-            background: transparent;
+            background: rgba(0, 255, 102, 0.05);
             border: 1px solid var(--neon-green);
             color: var(--neon-green);
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             font-size: 0.9rem;
             transition: all 0.3s ease;
-            box-shadow: 0 0 5px rgba(0, 255, 102, 0.2);
+            box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
         }
 
         .admin-btn:hover {
             background: var(--neon-green);
             color: var(--bg-color);
-            box-shadow: 0 0 15px var(--neon-glow);
+            box-shadow: 0 0 20px var(--neon-glow);
+            transform: translateY(-2px);
         }
 
         /* Contenedor Principal */
         .container {
-            max-width: 1050px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 20px 40px 20px;
+            padding: 0 20px 50px 20px;
         }
 
-        /* SECCIÓN HERO REDISEÑADA Y LLAMATIVA */
+        /* SECCIÓN HERO LLAMATIVA CON MARCO BRILLANTE */
         .hero-welcome {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
-            gap: 30px;
+            gap: 35px;
             align-items: center;
-            padding: 40px;
-            margin-top: 25px;
-            margin-bottom: 40px;
-            background: linear-gradient(135deg, rgba(6, 24, 15, 0.95) 0%, rgba(2, 8, 5, 0.98) 100%);
+            padding: 45px;
+            margin-top: 30px;
+            margin-bottom: 45px;
+            background: linear-gradient(135deg, rgba(5, 20, 12, 0.95) 0%, rgba(1, 5, 3, 0.99) 100%);
             border: 1px solid var(--border-color);
             border-radius: 20px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 255, 102, 0.08);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 255, 102, 0.1);
         }
 
-        .hero-welcome::before {
-            content: "";
+        /* Destello decorativo animado en el borde superior del Hero */
+        .hero-welcome::after {
+            content: '';
             position: absolute;
             top: 0;
-            right: 0;
+            left: 0;
             width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 80% 50%, rgba(0, 255, 102, 0.12) 0%, transparent 50%);
-            pointer-events: none;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            animation: borderGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         .welcome-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: rgba(0, 255, 102, 0.15);
             color: var(--neon-green);
             border: 1px solid var(--neon-green);
@@ -137,12 +178,12 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 15px;
-            box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
+            margin-bottom: 18px;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
         }
 
         .hero-text h2 {
-            font-size: 2.3rem;
+            font-size: 2.4rem;
             margin-bottom: 15px;
             font-weight: 800;
             letter-spacing: -0.5px;
@@ -151,12 +192,12 @@
 
         .hero-text h2 span {
             color: var(--neon-green);
-            text-shadow: 0 0 20px var(--neon-glow);
+            text-shadow: 0 0 25px var(--neon-glow);
         }
 
         .hero-text p {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 1.05rem;
             margin-bottom: 25px;
             line-height: 1.6;
         }
@@ -169,23 +210,25 @@
         }
 
         .stat-card {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 255, 102, 0.2);
-            padding: 12px 8px;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 102, 0.25);
+            padding: 14px 10px;
+            border-radius: 12px;
             text-align: center;
-            transition: transform 0.3s, border-color 0.3s;
+            transition: all 0.3s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-4px);
             border-color: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-glow);
         }
 
         .stat-number {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--neon-green);
+            text-shadow: 0 0 8px rgba(0,255,102,0.4);
         }
 
         .stat-label {
@@ -196,26 +239,26 @@
             margin-top: 4px;
         }
 
-        /* Banner Visual Izquierdo/Derecho */
+        /* Contenedor de Imagen Hero */
         .hero-image-container {
             position: relative;
-            height: 280px;
+            height: 300px;
             border-radius: 14px;
             overflow: hidden;
             border: 2px solid var(--border-color);
-            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.25);
         }
 
         .hero-image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            filter: brightness(0.85) contrast(1.1);
-            transition: transform 0.5s ease;
+            filter: brightness(0.9) contrast(1.15);
+            transition: transform 0.6s ease;
         }
 
         .hero-image-container:hover img {
-            transform: scale(1.05);
+            transform: scale(1.08);
         }
 
         .hero-image-overlay {
@@ -223,16 +266,17 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(to top, rgba(3, 7, 6, 0.95), transparent);
-            padding: 15px;
+            background: linear-gradient(to top, rgba(2, 8, 5, 0.95), transparent);
+            padding: 18px;
             text-align: center;
             font-weight: 700;
             color: var(--neon-green);
-            font-size: 0.95rem;
+            font-size: 1rem;
             letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
 
-        /* Título de la sección de Campos */
+        /* Título de la sección de Canchas */
         .section-header {
             display: flex;
             align-items: center;
@@ -241,7 +285,7 @@
         }
 
         .section-header h3 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             letter-spacing: 0.5px;
             color: var(--text-main);
         }
@@ -249,13 +293,13 @@
         .section-line {
             flex-grow: 1;
             height: 1px;
-            background: linear-gradient(to right, var(--border-color), transparent);
+            background: linear-gradient(to right, var(--neon-green), transparent);
         }
 
-        /* Cuadros / Secciones de Campos Deportivos */
+        /* Tarjetas de Canchas */
         .fields-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
@@ -263,55 +307,57 @@
         .field-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
         }
 
         .field-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 0 25px var(--neon-glow);
+            transform: translateY(-8px);
+            box-shadow: 0 0 30px var(--neon-glow);
             border-color: var(--neon-green);
         }
 
         .field-info {
-            padding: 22px;
+            padding: 25px;
         }
 
         .field-info h3 {
             color: var(--neon-green);
-            font-size: 1.3rem;
-            margin-bottom: 8px;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0,255,102,0.2);
         }
 
         .field-info p {
             color: var(--text-muted);
             font-size: 0.95rem;
-            margin-bottom: 15px;
-            line-height: 1.4;
+            margin-bottom: 18px;
+            line-height: 1.5;
         }
 
         .features-list {
             list-style: none;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .features-list li {
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .features-list li::before {
             content: "⚽";
-            font-size: 0.7rem;
+            font-size: 0.75rem;
         }
 
         .field-price {
@@ -319,35 +365,37 @@
             font-weight: 700;
             color: var(--text-main);
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 12px;
+            padding-top: 15px;
         }
 
         .field-price span {
             color: var(--neon-green);
-            font-size: 1.3rem;
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px var(--neon-glow);
         }
 
         .btn-select-field {
             width: 100%;
-            background: transparent;
-            border: 1px solid var(--neon-green);
+            background: rgba(0, 255, 102, 0.05);
+            border: none;
+            border-top: 1px solid var(--border-color);
             color: var(--neon-green);
-            padding: 14px;
+            padding: 16px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            border-radius: 0 0 12px 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            font-size: 0.95rem;
         }
 
         .btn-select-field:hover {
             background: var(--neon-green);
             color: var(--bg-color);
-            box-shadow: 0 0 15px var(--neon-glow);
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
         }
 
-        /* Interfaz de Reserva */
+        /* Sección de Reserva */
         #bookingSection {
             display: none;
         }
@@ -359,32 +407,36 @@
             cursor: pointer;
             text-decoration: none;
             font-weight: 600;
+            text-shadow: 0 0 8px rgba(0,255,102,0.3);
+            transition: transform 0.2s;
         }
 
         .back-link:hover {
+            transform: translateX(-5px);
             text-decoration: underline;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 25px;
+            border-radius: 14px;
+            padding: 30px;
             margin-bottom: 25px;
             backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
         }
 
         .card h3 {
             margin-bottom: 20px;
             color: var(--neon-green);
-            font-size: 1.3rem;
+            font-size: 1.35rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 10px;
+            padding-bottom: 12px;
+            text-shadow: 0 0 8px rgba(0,255,102,0.2);
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
@@ -396,50 +448,54 @@
 
         .form-control {
             width: 100%;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.5);
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-main);
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
         }
 
         .form-control:focus {
             border-color: var(--neon-green);
-            box-shadow: 0 0 8px var(--neon-glow);
+            box-shadow: 0 0 12px var(--neon-glow);
+            background: rgba(0, 0, 0, 0.8);
         }
 
-        /* Selección de Horarios */
+        /* Horarios Grid */
         .slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
             margin-bottom: 10px;
         }
 
         .slot-btn {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: var(--text-main);
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px 10px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: center;
             font-weight: 600;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
         }
 
         .slot-btn:hover {
             border-color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(0,255,102,0.2);
+            transform: translateY(-2px);
         }
 
         .slot-btn.selected {
             background: var(--neon-green);
             color: var(--bg-color);
             border-color: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-glow);
+            box-shadow: 0 0 15px var(--neon-glow);
+            font-weight: 700;
         }
 
         .slot-btn.blocked {
@@ -459,37 +515,44 @@
         }
 
         .pay-option {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 18px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: center;
             font-weight: 600;
             transition: all 0.3s;
         }
 
+        .pay-option:hover {
+            border-color: rgba(0,255,102,0.5);
+        }
+
         .pay-option.selected {
             border-color: var(--neon-green);
-            background: rgba(0, 255, 102, 0.1);
-            box-shadow: 0 0 10px var(--neon-glow);
+            background: rgba(0, 255, 102, 0.12);
+            box-shadow: 0 0 15px var(--neon-glow);
+            color: var(--neon-green);
         }
 
         #yape-details {
             display: none;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             border: 1px dashed var(--neon-green);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 12px;
             text-align: center;
             margin-bottom: 20px;
+            box-shadow: inset 0 0 20px rgba(0,255,102,0.05);
         }
 
         #yape-details img {
-            max-width: 160px;
-            border-radius: 8px;
-            margin: 10px 0;
+            max-width: 170px;
+            border-radius: 10px;
+            margin: 12px 0;
             border: 2px solid var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-glow);
         }
 
         .btn-main {
@@ -497,21 +560,24 @@
             background: var(--neon-green);
             color: var(--bg-color);
             border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 1.15rem;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 0 15px var(--neon-glow);
-            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 0 20px var(--neon-glow);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-main:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+            opacity: 0.95;
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px var(--neon-glow);
         }
 
-        /* Modal Panel Dueño Ampliado */
+        /* Modal Panel Dueño */
         .modal {
             display: none;
             position: fixed;
@@ -519,39 +585,40 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.88);
             z-index: 2000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
 
         .modal-content {
-            background: #08110e;
+            background: #040e09;
             border: 1px solid var(--neon-green);
-            padding: 25px;
-            border-radius: 12px;
+            padding: 30px;
+            border-radius: 16px;
             width: 95%;
-            max-width: 550px;
+            max-width: 580px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 0 25px var(--neon-glow);
+            box-shadow: 0 0 35px var(--neon-glow);
             position: relative;
         }
 
         .close-modal {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 18px;
+            right: 18px;
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             cursor: pointer;
+            transition: color 0.2s;
         }
 
         .close-modal:hover {
-            color: var(--text-main);
+            color: var(--neon-green);
         }
 
         .admin-panel-content {
@@ -562,10 +629,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(0,0,0,0.4);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin-bottom: 8px;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             border: 1px solid rgba(255,255,255,0.1);
             font-size: 0.9rem;
         }
@@ -574,10 +641,15 @@
             background: #ff4757;
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 7px 14px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .btn-block-action:hover {
+            opacity: 0.85;
         }
 
         .btn-block-action.unblock {
@@ -586,11 +658,11 @@
         }
 
         .admin-booking-item {
-            background: rgba(0, 255, 102, 0.05);
+            background: rgba(0, 255, 102, 0.06);
             border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 12px;
             font-size: 0.9rem;
         }
 
@@ -604,7 +676,7 @@
                 padding: 25px;
             }
             .hero-image-container {
-                height: 200px;
+                height: 220px;
                 margin-top: 10px;
             }
         }
@@ -621,10 +693,10 @@
     </header>
 
     <div class="container">
-        <!-- VISTA INICIAL: CATÁLOGO DE CANCHAS Y BIENVENIDA -->
+        <!-- VISTA INICIAL: CATÁLOGO Y BIENVENIDA -->
         <div id="catalogSection">
             
-            <!-- SECCIÓN HERO REDISEÑADA CON IMAGEN Y ESTILO LLAMATIVO -->
+            <!-- HERO REDISEÑADO CON LUZ NEÓN -->
             <div class="hero-welcome">
                 <div class="hero-text">
                     <div class="welcome-badge">⚡ Plataforma Oficial de Reservas ⚡</div>
@@ -647,14 +719,13 @@
                     </div>
                 </div>
 
-                <!-- Imagen decorativa de alta calidad representando una cancha sintética nocturna -->
                 <div class="hero-image-container">
                     <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&w=800&q=80" alt="Cancha Sintética de Fútbol">
                     <div class="hero-image-overlay">⚽ Canchas de Primer Nivel en Huacho</div>
                 </div>
             </div>
 
-            <!-- TÍTULO SEPARADOR DE CAMPOS -->
+            <!-- TÍTULO SEPARADOR -->
             <div class="section-header">
                 <h3>Elige tu Cancha Deportiva</h3>
                 <div class="section-line"></div>
@@ -673,7 +744,7 @@
                         </ul>
                         <div class="field-price">Tarifa: <span>S/ 60.00</span> / hora</div>
                     </div>
-                    <button class="btn-select-field" onclick="selectField('cancha1', 'Cancha Sintética El Triunfo')">Ver Horarios y Reservar</button>
+                    <button class="btn-select-field" onclick="selectField('cancha1', 'Cancha Sintética El Triunfo')">Ver Horarios y Reservar ➔</button>
                 </div>
 
                 <!-- Cancha 2 -->
@@ -688,7 +759,7 @@
                         </ul>
                         <div class="field-price">Tarifa: <span>S/ 60.00</span> / hora</div>
                     </div>
-                    <button class="btn-select-field" onclick="selectField('cancha2', 'Complejo Deportivo Los Crack')">Ver Horarios y Reservar</button>
+                    <button class="btn-select-field" onclick="selectField('cancha2', 'Complejo Deportivo Los Crack')">Ver Horarios y Reservar ➔</button>
                 </div>
             </div>
         </div>
@@ -697,8 +768,8 @@
         <div id="bookingSection">
             <a class="back-link" onclick="goHome()">← Volver al catálogo de canchas</a>
             
-            <div class="hero-title" style="margin-bottom: 25px;">
-                <h2 id="selectedFieldTitle" style="font-size: 2.2rem; margin-bottom: 10px;">Reservando Cancha</h2>
+            <div style="margin-bottom: 25px;">
+                <h2 id="selectedFieldTitle" style="font-size: 2.2rem; margin-bottom: 8px;">Reservando Cancha</h2>
                 <p style="color: var(--text-muted);">Elige tu hora libre, llena tus datos y adjunta tu constancia de pago.</p>
             </div>
 
@@ -728,11 +799,11 @@
 
                 <div id="yape-details">
                     <p>Yapea al número autorizado del complejo:</p>
-                    <h4 style="color: var(--neon-green); margin: 5px 0;" id="ownerPhoneDisplay">999 999 999</h4>
-                    <div style="background: white; padding: 10px; display: inline-block; border-radius: 8px;">
+                    <h3 style="color: var(--neon-green); margin: 8px 0;" id="ownerPhoneDisplay">999 999 999</h3>
+                    <div style="background: white; padding: 10px; display: inline-block; border-radius: 8px; box-shadow: 0 0 10px white;">
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YapeDeporHuacho" alt="QR Yape">
                     </div>
-                    <div class="form-group" style="margin-top: 15px; text-align: left;">
+                    <div class="form-group" style="margin-top: 18px; text-align: left;">
                         <label>Adjunta la captura de tu comprobante Yape/Plin:</label>
                         <input type="file" id="voucherFile" class="form-control" accept="image/*">
                     </div>
@@ -743,7 +814,7 @@
         </div>
     </div>
 
-    <!-- Modal de Acceso Panel Dueño -->
+    <!-- Modal Panel Dueño -->
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeAdminModal()">&times;</button>
@@ -766,9 +837,9 @@
 
             <div id="adminPanelSection" class="admin-panel-content">
                 <div class="form-group">
-                    <label>Modificar mi número de WhatsApp (<span id="currentEditingComplexName" style="color:var(--neon-green)">Cancha</span>):</label>
+                    <label>Modificar número de WhatsApp (<span id="currentEditingComplexName" style="color:var(--neon-green)">Cancha</span>):</label>
                     <input type="text" id="adminNewPhone" class="form-control">
-                    <button class="admin-btn" style="width: 100%; margin-top: 8px;" onclick="saveOwnerPhone()">💾 Guardar Número de WhatsApp</button>
+                    <button class="admin-btn" style="width: 100%; margin-top: 10px;" onclick="saveOwnerPhone()">💾 Guardar Número de WhatsApp</button>
                 </div>
                 
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
@@ -975,6 +1046,7 @@
 
         function loadAdminBookings(complex) {
             const bookingsDiv = document.getElementById('adminBookingsList');
+            bookingsDiv.innerHTML = `;`
             bookingsDiv.innerHTML = '';
             
             const bookings = dbData[complex].bookings || [];
@@ -1015,6 +1087,7 @@
             });
         }
 
+        function toggleBlockSlot(complex, hour} { // Corregido sintaxis
         function toggleBlockSlot(complex, hour) {
             const index = dbData[complex].blocked.indexOf(hour);
             if(index > -1) {
