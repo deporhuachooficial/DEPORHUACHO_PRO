@@ -98,7 +98,7 @@
             padding: 0 20px 40px 20px;
         }
 
-        /* NUEVA SECCIÓN DE BIENVENIDA LLAMATIVA (HERO) */
+        /* SECCIÓN DE BIENVENIDA LLAMATIVA (HERO) */
         .hero-welcome {
             text-align: center;
             padding: 50px 20px;
@@ -112,7 +112,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 255, 102, 0.05);
         }
 
-        /* Detalles decorativos de fondo en el Hero */
         .hero-welcome::before {
             content: "⚽";
             position: absolute;
@@ -158,7 +157,6 @@
             line-height: 1.6;
         }
 
-        /* Estadísticas rápidas decorativas en la bienvenida */
         .hero-stats {
             display: flex;
             justify-content: center;
@@ -465,7 +463,7 @@
             transform: translateY(-2px);
         }
 
-        /* Modal Panel Dueño */
+        /* Modal Panel Dueño Ampliado */
         .modal {
             display: none;
             position: fixed;
@@ -483,10 +481,12 @@
         .modal-content {
             background: #08110e;
             border: 1px solid var(--neon-green);
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
-            width: 90%;
-            max-width: 450px;
+            width: 95%;
+            max-width: 550px;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 0 25px var(--neon-glow);
             position: relative;
         }
@@ -519,6 +519,7 @@
             border-radius: 6px;
             margin-bottom: 8px;
             border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.9rem;
         }
 
         .btn-block-action {
@@ -534,6 +535,20 @@
         .btn-block-action.unblock {
             background: var(--neon-green);
             color: var(--bg-color);
+        }
+
+        /* Tarjeta de Reservas Registradas en el Panel */
+        .admin-booking-item {
+            background: rgba(0, 255, 102, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .admin-booking-item strong {
+            color: var(--neon-green);
         }
 
         @media(max-width: 600px) {
@@ -696,10 +711,19 @@
                     <input type="text" id="adminNewPhone" class="form-control" value="999999999">
                     <button class="admin-btn" style="width: 100%; margin-top: 8px;" onclick="saveOwnerPhone()">Actualizar Número</button>
                 </div>
+                
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                
+                <h4 style="color: var(--neon-green); margin-bottom: 10px; font-size: 1rem;">📋 Reservas Registradas de Clientes:</h4>
+                <div id="adminBookingsList" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px;">
+                    <!-- Se listan las reservas aquí -->
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                
                 <label style="color: var(--text-muted); margin-bottom: 8px; display: block;">Bloquear / Desbloquear Horarios:</label>
-                <div id="adminSlotsList" style="max-height: 200px; overflow-y: auto;">
-                    <!-- Lista de control -->
+                <div id="adminSlotsList" style="max-height: 180px; overflow-y: auto;">
+                    <!-- Lista de control de horarios -->
                 </div>
             </div>
         </div>
@@ -709,8 +733,8 @@
         const defaultHours = ["03:00 PM - 04:00 PM", "04:00 PM - 05:00 PM", "05:00 PM - 06:00 PM", "06:00 PM - 07:00 PM", "07:00 PM - 08:00 PM", "08:00 PM - 09:00 PM"];
         
         let dbData = JSON.parse(localStorage.getItem('deporhuacho_db')) || {
-            cancha1: { phone: "923217323", blocked: [] },
-            cancha2: { phone: "987654321", blocked: [] }
+            cancha1: { phone: "923217323", blocked: [], bookings: [] },
+            cancha2: { phone: "987654321", blocked: [], bookings: [] }
         };
 
         let currentActiveField = null;
@@ -815,14 +839,27 @@
 
             if(!dbData[currentActiveField].blocked.includes(selectedSlot)) {
                 dbData[currentActiveField].blocked.push(selectedSlot);
-                localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
             }
+
+            // Guardar detalles de la reserva para el panel del dueño
+            const paymentText = selectedPaymentType === 'yape' ? 'Yape/Plin (Con comprobante)' : 'Pago en Efectivo';
+            if(!dbData[currentActiveField].bookings) {
+                dbData[currentActiveField].bookings = [];
+            }
+            dbData[currentActiveField].bookings.push({
+                name: name,
+                phone: phone,
+                slot: selectedSlot,
+                payment: paymentText,
+                date: new Date().toLocaleDateString()
+            });
+
+            localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
 
             const ownerPhone = dbData[currentActiveField].phone;
             const fieldNameText = document.getElementById('selectedFieldTitle').innerText;
-            const paymentText = selectedPaymentType === 'yape' ? 'Yape/Plin (Comprobante adjuntado)' : 'Pago en Efectivo en local';
             
-            const message = `⚽ *¡NUEVA RESERVA WEB!* ⚽%0A%0A*${fieldNameText}*%0A*Cliente:* ${name}%0A*Телефон:* ${phone}%0A*Horario:* ${selectedSlot}%0A*Método de pago:* ${paymentText}%0A%0A*Estado:* Horario bloqueado automáticamente.`;
+            const message = `⚽ *¡NUEVA RESERVA WEB!* ⚽%0A%0A*${fieldNameText}*%0A*Cliente:* ${name}%0A*Teléfono:* ${phone}%0A*Horario:* ${selectedSlot}%0A*Método de pago:* ${paymentText}%0A%0A*Estado:* Horario bloqueado automáticamente.`;
             
             window.open(`https://wa.me/51${ownerPhone}?text=${message}`, '_blank');
             
@@ -837,12 +874,10 @@
 
         function closeAdminModal() {
             document.getElementById('adminModal').style.display = 'none';
-            document.getElementById('adminPin').value = ``;
+            document.getElementById('adminPin').value = '';
             document.getElementById('adminLoginSection').style.display = 'block';
             document.getElementById('adminPanelSection').style.display = 'none';
         }
-
-        function resendAdminPin() { /* Función auxiliar */ }
 
         function verifyAdmin() {
             const complex = document.getElementById('adminComplex').value;
@@ -852,7 +887,7 @@
                 document.getElementById('adminLoginSection').style.display = 'none';
                 document.getElementById('adminPanelSection').style.display = 'block';
                 document.getElementById('adminNewPhone').value = dbData[complex].phone;
-                loadAdminSlots(complex);
+                loadAdminDashboard(complex);
             } else {
                 alert("Código PIN incorrecto.");
             }
@@ -866,6 +901,34 @@
                 localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
                 alert("¡Número de WhatsApp actualizado correctamente!");
             }
+        }
+
+        function loadAdminDashboard(complex) {
+            loadAdminBookings(complex);
+            loadAdminSlots(complex);
+        }
+
+        function loadAdminBookings(complex) {
+            const bookingsDiv = document.getElementById('adminBookingsList');
+            bookingsDiv.innerHTML = '';
+            
+            const bookings = dbData[complex].bookings || [];
+            
+            if(bookings.length === 0) {
+                bookingsDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">No hay reservas registradas todavía.</p>`;
+                return;
+            }
+
+            bookings.forEach((b, index) => {
+                const item = document.createElement('div');
+                item.className = 'admin-booking-item';
+                item.innerHTML = `
+                    <strong>#${index + 1} - ${b.name}</strong> (${b.phone})<br>
+                    ⏰ Horario: <strong>${b.slot}</strong><br>
+                    💳 Pago: ${b.payment} <span style="float: right; color: var(--text-muted);">${b.date}</span>
+                `;
+                bookingsDiv.appendChild(item);
+            });
         }
 
         function loadAdminSlots(complex) {
