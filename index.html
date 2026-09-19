@@ -9,8 +9,8 @@
     
     <style>
         :root {
-            --bg-color: #020604;
-            --card-bg: rgba(6, 16, 11, 0.85);
+            --bg-color: #030d07;
+            --card-bg: rgba(6, 18, 12, 0.90);
             --neon-green: #00ff66;
             --neon-glow: rgba(0, 255, 102, 0.5);
             --text-main: #ffffff;
@@ -25,20 +25,32 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* FONDO DINÁMICO CON LÍNEAS / RAYAS VERDES EN MOVIMIENTO Y CUADRÍCULAS */
+        /* DISEÑO DE FONDO DEPORTIVO LLAMATIVO (ESTILO CAMPO DE FÚTBOL CON LÍNEAS Y RADAR) */
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            
+            /* Textura de césped / cuadrícula base */
             background-image: 
-                linear-gradient(rgba(0, 255, 102, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 102, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(rgba(0, 255, 102, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 102, 0.04) 1px, transparent 1px),
+                /* Círculo central simulando la mitad de una cancha de fútbol en el fondo */
+                radial-gradient(circle at 50% 30%, rgba(0, 255, 102, 0.08) 0%, transparent 40%),
+                /* Bandas verticales alternadas estilo corte de pasto sintético */
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 60px,
+                    rgba(0, 0, 0, 0.25) 60px,
+                    rgba(0, 0, 0, 0.25) 120px
+                );
+            background-size: 50px 50px, 50px 50px, 100% 100%, 100% 120px;
         }
 
-        /* Efecto de líneas / destellos verdes animados cruzando el fondo */
+        /* Rayas verdes / láseres diagonales en movimiento cruzando el fondo */
         body::before {
             content: "";
             position: fixed;
@@ -49,11 +61,11 @@
             background: linear-gradient(
                 45deg, 
                 transparent 45%, 
-                rgba(0, 255, 102, 0.04) 50%, 
+                rgba(0, 255, 102, 0.05) 50%, 
                 transparent 55%
             );
             transform: rotate(25deg);
-            animation: backgroundLaser 12s linear infinite;
+            animation: backgroundLaser 10s linear infinite;
             pointer-events: none;
             z-index: -1;
         }
@@ -63,13 +75,28 @@
             100% { transform: translateY(100%) rotate(25deg); }
         }
 
+        /* Brillos de luces de estadio difuminadas en las esquinas */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 102, 0.12) 0%, transparent 35%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 102, 0.08) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
         /* Barra de Navegación */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 15px 5%;
-            background: rgba(2, 8, 5, 0.95);
+            background: rgba(2, 10, 6, 0.95);
             border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
@@ -131,7 +158,7 @@
             padding: 0 20px 50px 20px;
         }
 
-        /* SECCIÓN HERO LLAMATIVA CON MARCO BRILLANTE */
+        /* SECCIÓN HERO */
         .hero-welcome {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
@@ -140,15 +167,14 @@
             padding: 45px;
             margin-top: 30px;
             margin-bottom: 45px;
-            background: linear-gradient(135deg, rgba(5, 20, 12, 0.95) 0%, rgba(1, 5, 3, 0.99) 100%);
+            background: linear-gradient(135deg, rgba(6, 22, 14, 0.95) 0%, rgba(2, 8, 5, 0.98) 100%);
             border: 1px solid var(--border-color);
             border-radius: 20px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 255, 102, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 255, 102, 0.08);
         }
 
-        /* Destello decorativo animado en el borde superior del Hero */
         .hero-welcome::after {
             content: '';
             position: absolute;
@@ -239,7 +265,6 @@
             margin-top: 4px;
         }
 
-        /* Contenedor de Imagen Hero */
         .hero-image-container {
             position: relative;
             height: 300px;
@@ -276,7 +301,7 @@
             text-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
 
-        /* Título de la sección de Canchas */
+        /* Sección Canchas */
         .section-header {
             display: flex;
             align-items: center;
@@ -296,7 +321,6 @@
             background: linear-gradient(to right, var(--neon-green), transparent);
         }
 
-        /* Tarjetas de Canchas */
         .fields-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -696,7 +720,6 @@
         <!-- VISTA INICIAL: CATÁLOGO Y BIENVENIDA -->
         <div id="catalogSection">
             
-            <!-- HERO REDISEÑADO CON LUZ NEÓN -->
             <div class="hero-welcome">
                 <div class="hero-text">
                     <div class="welcome-badge">⚡ Plataforma Oficial de Reservas ⚡</div>
@@ -725,7 +748,6 @@
                 </div>
             </div>
 
-            <!-- TÍTULO SEPARADOR -->
             <div class="section-header">
                 <h3>Elige tu Cancha Deportiva</h3>
                 <div class="section-line"></div>
@@ -1046,7 +1068,6 @@
 
         function loadAdminBookings(complex) {
             const bookingsDiv = document.getElementById('adminBookingsList');
-            bookingsDiv.innerHTML = `;`
             bookingsDiv.innerHTML = '';
             
             const bookings = dbData[complex].bookings || [];
@@ -1087,7 +1108,6 @@
             });
         }
 
-        function toggleBlockSlot(complex, hour} { // Corregido sintaxis
         function toggleBlockSlot(complex, hour) {
             const index = dbData[complex].blocked.indexOf(hour);
             if(index > -1) {
