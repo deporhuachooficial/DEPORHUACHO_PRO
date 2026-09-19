@@ -713,7 +713,7 @@
                 <div class="hero-text">
                     <div class="welcome-badge">⚡ Plataforma Oficial de Reservas ⚡</div>
                     <h2>Vive la Pasión del Fútbol en <span>DeporHuacho</span></h2>
-                    <p>Reserva los mejores complejos sintéticos de la ciudad al instante. Asegura tu horario preferido y organiza tus partidos de manera rápida y segura.</p>
+                    <p>Reserva los mejores complejos sintéticos de la ciudad al instante. Asegura tus horarios preferidos y organiza tus partidos de manera rápida y segura.</p>
                     
                     <div class="hero-stats">
                         <div class="stat-card">
@@ -781,11 +781,11 @@
             
             <div style="margin-bottom: 25px;">
                 <h2 id="selectedFieldTitle" style="font-size: 2.2rem; margin-bottom: 8px;">Reservando Cancha</h2>
-                <p style="color: var(--text-muted);">Elige tu hora libre, llena tus datos y adjunta tu constancia de pago.</p>
+                <p style="color: var(--text-muted);">Elige una o más horas libres, llena tus datos y confirma tu reserva.</p>
             </div>
 
             <div class="card">
-                <h3>1. Horarios Disponibles (S/ 60 la hora)</h3>
+                <h3>1. Horarios Disponibles (Puedes elegir varios - S/ 60 la hora)</h3>
                 <div class="slots-grid" id="slotsGrid"></div>
             </div>
 
@@ -843,6 +843,11 @@
             </div>
 
             <div id="adminPanelSection" class="admin-panel-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Sesión Activa</span>
+                    <button onclick="logoutAdmin()" style="background: rgba(255,71,87,0.15); border: 1px solid #ff4757; color: #ff6b6b; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">🚪 Cerrar Sesión</button>
+                </div>
+
                 <div class="form-group">
                     <label>Modificar número de WhatsApp (<span id="currentEditingComplexName" style="color:var(--neon-green)">Cancha</span>):</label>
                     <input type="text" id="adminNewPhone" class="form-control">
@@ -862,9 +867,8 @@
         </div>
     </div>
 
-    <!-- Script con Firebase Realtime Database y Sesión Persistente -->
+    <!-- Script con Firebase, Selección Múltiple y Cierre de Sesión con Advertencia -->
     <script>
-        // Configuración de Firebase (Tus credenciales reales)
         const firebaseConfig = {
             databaseURL: "https://deporhuacho-pro-default-rtdb.firebaseio.com"
         };
@@ -879,10 +883,9 @@
         };
 
         let currentActiveField = null;
-        let selectedSlot = null;
+        let selectedSlots = []; // Array para permitir selección múltiple
         let selectedPaymentType = null;
 
-        // Escuchar cambios en tiempo real desde Firebase
         db.ref('/').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -892,14 +895,13 @@
                     renderAdminPanelData();
                 }
             } else {
-                // Si la BD está vacía, inicializarla
                 db.ref('/').set(dbData);
             }
         });
 
         function selectField(fieldKey, fieldName) {
             currentActiveField = fieldKey;
-            selectedSlot = null;
+            selectedSlots = [];
             selectedPaymentType = null;
             
             document.getElementById('selectedFieldTitle').innerText = "Reservando: " + fieldName;
@@ -922,12 +924,17 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function selectSlot(hour, btnElement) {
-            document.querySelectorAll('.slot-btn').forEach(b => {
-                if(!b.classList.contains('blocked')) b.classList.remove('selected');
-            });
-            selectedSlot = hour;
-            btnElement.classList.add('selected');
+        function toggleSlotSelection(hour, btnElement) {
+            const index = selectedSlots.indexOf(hour);
+            if (index > -1) {
+                // Si ya estaba seleccionado, lo quitamos
+                selectedSlots.splice(index, 1);
+                btnElement.classList.remove('selected');
+            } else {
+                // Si no estaba, lo agregamos a la lista múltiple
+                selectedSlots.push(hour);
+                btnElement.classList.add('selected');
+            }
         }
 
         function selectPayment(type) {
@@ -959,8 +966,10 @@
                     btn.classList.add('blocked');
                     btn.title = "Horario No Disponible";
                 } else {
-                    if (selectedSlot === hour) btn.classList.add('selected');
-                    btn.onclick = () => selectSlot(hour, btn);
+                    if (selectedSlots.includes(hour)) {
+                        btn.classList.add('selected');
+                    }
+                    btn.onclick = () => toggleSlotSelection(hour, btn);
                 }
                 grid.appendChild(btn);
             });
@@ -978,8 +987,8 @@
                 alert("Por favor ingresa tu número de celular.");
                 return;
             }
-            if (!selectedSlot) {
-                alert("Por favor selecciona un horario disponible.");
+            if (selectedSlots.length === 0) {
+                alert("Por favor selecciona al menos un horario disponible.");
                 return;
             }
             if (!selectedPaymentType) {
@@ -988,33 +997,36 @@
             }
 
             const fieldInfo = dbData[currentActiveField];
+            const slotsText = selectedSlots.join(', ');
+            const totalPrice = selectedSlots.length * 60; // S/ 60 por cada hora seleccionada
+
             const bookingData = {
                 name: name,
                 phone: phone,
-                slot: selectedSlot,
+                slot: slotsText,
                 payment: selectedPaymentType === 'yape' ? 'Yape / Plin' : 'Efectivo',
+                total: `S/ ${totalPrice}.00`,
                 timestamp: new Date().toLocaleString()
             };
 
-            // Guardar reserva en Firebase y bloquear el horario automáticamente
             let blockedList = fieldInfo.blocked || [];
-            if (!blockedList.includes(selectedSlot)) {
-                blockedList.push(selectedSlot);
-            }
+            selectedSlots.forEach(slot => {
+                if (!blockedList.includes(slot)) {
+                    blockedList.push(slot);
+                }
+            });
 
             db.ref(currentActiveField + '/blocked').set(blockedList);
             db.ref(currentActiveField + '/bookings').push(bookingData);
 
-            // Redirigir al WhatsApp del dueño
             const ownerPhone = fieldInfo.phone || "923217323";
-            const text = `Hola! Deseo confirmar mi reserva en *${fieldInfo.name}*:%0A- *Cliente:* ${name}%0A- *Celular:* ${phone}%0A- *Horario:* ${selectedSlot}%0A- *Pago:* ${bookingData.payment}`;
+            const text = `Hola! Deseo confirmar mi reserva en *${fieldInfo.name}*:%0A- *Cliente:* ${name}%0A- *Celular:* ${phone}%0A- *Horarios:* ${slotsText}%0A- *Total a pagar:* S/ ${totalPrice}.00%0A- *Pago:* ${bookingData.payment}`;
             
             window.open(`https://wa.me/51${ownerPhone}?text=${text}`, '_blank');
             goHome();
             alert("¡Reserva registrada con éxito en la nube!");
         }
 
-        // Lógica del Panel de Dueño con sessionStorage
         function openAdminModal() {
             document.getElementById('adminModal').style.display = 'flex';
             const savedSession = sessionStorage.getItem('deporhuacho_admin_session');
@@ -1048,6 +1060,16 @@
             }
         }
 
+        // Función de cerrar sesión con advertencia de confirmación
+        function logoutAdmin() {
+            if (confirm("⚠️ ¿Estás seguro de que deseas salir del panel de administración?")) {
+                sessionStorage.removeItem('deporhuacho_admin_session');
+                document.getElementById('adminPanelSection').style.display = 'none';
+                document.getElementById('adminLoginSection').style.display = 'block';
+                document.getElementById('adminPin').value = '';
+            }
+        }
+
         function onAdminComplexChange() {
             renderAdminPanelData();
         }
@@ -1060,7 +1082,6 @@
             document.getElementById('currentEditingComplexName').innerText = fieldInfo.name;
             document.getElementById('adminNewPhone').value = fieldInfo.phone || '';
 
-            // Renderizar reservas de clientes
             const bookingsListDiv = document.getElementById('adminBookingsList');
             bookingsListDiv.innerHTML = '';
             const bookings = fieldInfo.bookings || {};
@@ -1074,15 +1095,14 @@
                     bookingsListDiv.innerHTML += `
                         <div class="admin-booking-item">
                             <strong>${b.name}</strong> (${b.phone})<br>
-                            ⏰ ${b.slot} | 💳 ${b.payment}<br>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">${b.timestamp}</span>
+                            ⏰ ${b.slot} | 💰 ${b.total || 'S/ 60.00'}<br>
+                            💳 ${b.payment} | <span style="font-size: 0.75rem; color: var(--text-muted);">${b.timestamp}</span>
                             <button onclick="deleteBooking('${complexKey}', '${key}')" style="float: right; background: #ff4757; border: none; color: white; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Eliminar</button>
                         </div>
                     `;
                 });
             }
 
-            // Renderizar control de horarios bloqueados
             const slotsListDiv = document.getElementById('adminSlotsList');
             slotsListDiv.innerHTML = '';
             const blockedList = fieldInfo.blocked || [];
