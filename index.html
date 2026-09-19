@@ -98,89 +98,137 @@
             padding: 0 20px 40px 20px;
         }
 
-        /* SECCIÓN DE BIENVENIDA LLAMATIVA (HERO) */
+        /* SECCIÓN HERO REDISEÑADA Y LLAMATIVA */
         .hero-welcome {
-            text-align: center;
-            padding: 50px 20px;
-            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            align-items: center;
+            padding: 40px;
+            margin-top: 25px;
             margin-bottom: 40px;
-            background: linear-gradient(135deg, rgba(10, 30, 20, 0.8) 0%, rgba(3, 10, 7, 0.9) 100%);
+            background: linear-gradient(135deg, rgba(6, 24, 15, 0.95) 0%, rgba(2, 8, 5, 0.98) 100%);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 20px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 255, 102, 0.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 255, 102, 0.08);
         }
 
         .hero-welcome::before {
-            content: "⚽";
+            content: "";
             position: absolute;
-            font-size: 8rem;
-            opacity: 0.03;
-            right: -20px;
-            bottom: -30px;
-            transform: rotate(-15deg);
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 80% 50%, rgba(0, 255, 102, 0.12) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .welcome-badge {
             display: inline-block;
-            background: rgba(0, 255, 102, 0.1);
+            background: rgba(0, 255, 102, 0.15);
             color: var(--neon-green);
             border: 1px solid var(--neon-green);
             padding: 6px 16px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-bottom: 15px;
-            box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+            box-shadow: 0 0 12px rgba(0, 255, 102, 0.3);
         }
 
-        .hero-welcome h2 {
-            font-size: 2.5rem;
+        .hero-text h2 {
+            font-size: 2.3rem;
             margin-bottom: 15px;
             font-weight: 800;
             letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
-        .hero-welcome h2 span {
+        .hero-text h2 span {
             color: var(--neon-green);
-            text-shadow: 0 0 15px var(--neon-glow);
+            text-shadow: 0 0 20px var(--neon-glow);
         }
 
-        .hero-welcome p {
+        .hero-text p {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto 25px auto;
+            font-size: 1rem;
+            margin-bottom: 25px;
             line-height: 1.6;
         }
 
         .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
         }
 
-        .stat-item {
+        .stat-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 102, 0.2);
+            padding: 12px 8px;
+            border-radius: 10px;
             text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--neon-green);
         }
 
         .stat-number {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--neon-green);
         }
 
         .stat-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        /* Banner Visual Izquierdo/Derecho */
+        .hero-image-container {
+            position: relative;
+            height: 280px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85) contrast(1.1);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-image-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .hero-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(3, 7, 6, 0.95), transparent);
+            padding: 15px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--neon-green);
+            font-size: 0.95rem;
             letter-spacing: 0.5px;
         }
 
@@ -550,9 +598,14 @@
             color: var(--neon-green);
         }
 
-        @media(max-width: 600px) {
-            .payment-options {
+        @media(max-width: 768px) {
+            .hero-welcome {
                 grid-template-columns: 1fr;
+                padding: 25px;
+            }
+            .hero-image-container {
+                height: 200px;
+                margin-top: 10px;
             }
         }
     </style>
@@ -570,27 +623,38 @@
     <div class="container">
         <!-- VISTA INICIAL: CATÁLOGO DE CANCHAS Y BIENVENIDA -->
         <div id="catalogSection">
+            
+            <!-- SECCIÓN HERO REDISEÑADA CON IMAGEN Y ESTILO LLAMATIVO -->
             <div class="hero-welcome">
-                <div class="welcome-badge">⚡ Plataforma Oficial de Reservas ⚡</div>
-                <h2>Bienvenido a <span>DeporHuacho</span></h2>
-                <p>Tu plataforma rápida y segura para reservar los mejores complejos sintéticos de la ciudad. Selecciona tu cancha favorita, revisa los horarios libres al instante y asegura tu partido sin complicaciones.</p>
-                
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">En Línea</div>
+                <div class="hero-text">
+                    <div class="welcome-badge">⚡ Plataforma Oficial de Reservas ⚡</div>
+                    <h2>Vive la Pasión del Fútbol en <span>DeporHuacho</span></h2>
+                    <p>Reserva los mejores complejos sintéticos de la ciudad al instante. Asegura tu horario preferido y organiza tus partidos de manera rápida y segura.</p>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">En Línea</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">S/ 60</div>
+                            <div class="stat-label">Por Hora</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">Directo</div>
+                            <div class="stat-label">WhatsApp</div>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number">S/ 60</div>
-                        <div class="stat-label">Tarifa Estándar</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">Rápido</div>
-                        <div class="stat-label">Vía WhatsApp</div>
-                    </div>
+                </div>
+
+                <!-- Imagen decorativa de alta calidad representando una cancha sintética nocturna -->
+                <div class="hero-image-container">
+                    <img src="https://images.unsplash.com/photo-1529900748604-07564a03e7a6?auto=format&fit=crop&w=800&q=80" alt="Cancha Sintética de Fútbol">
+                    <div class="hero-image-overlay">⚽ Canchas de Primer Nivel en Huacho</div>
                 </div>
             </div>
 
+            <!-- TÍTULO SEPARADOR DE CAMPOS -->
             <div class="section-header">
                 <h3>Elige tu Cancha Deportiva</h3>
                 <div class="section-line"></div>
@@ -723,13 +787,11 @@
     <script>
         const defaultHours = ["03:00 PM - 04:00 PM", "04:00 PM - 05:00 PM", "05:00 PM - 06:00 PM", "06:00 PM - 07:00 PM", "07:00 PM - 08:00 PM", "08:00 PM - 09:00 PM"];
         
-        // Base de datos inicial precargada
         let defaultDb = {
             cancha1: { name: "Cancha Sintética El Triunfo", phone: "923217323", blocked: [], bookings: [] },
             cancha2: { name: "Complejo Deportivo Los Crack", phone: "987654321", blocked: [], bookings: [] }
         };
 
-        // Cargar desde localStorage o inicializar
         let dbData = JSON.parse(localStorage.getItem('deporhuacho_db')) || defaultDb;
 
         let currentActiveField = null;
@@ -849,7 +911,6 @@
                 date: new Date().toLocaleDateString()
             });
 
-            // Guardar permanentemente en LocalStorage
             localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
 
             const ownerPhone = dbData[currentActiveField].phone;
@@ -863,7 +924,6 @@
             goHome();
         }
 
-        // Lógica del Panel Dueño
         function openAdminModal() {
             document.getElementById('adminModal').style.display = 'flex';
             onAdminComplexChange();
@@ -900,7 +960,6 @@
             const newPhone = document.getElementById('adminNewPhone').value.trim();
             if(newPhone) {
                 dbData[complex].phone = newPhone;
-                // Guardado inmediato y persistente
                 localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
                 alert("¡Número de WhatsApp actualizado y guardado correctamente!");
             } else {
@@ -963,7 +1022,6 @@
             } else {
                 dbData[complex].blocked.push(hour);
             }
-            // Guardado inmediato y persistente al bloquear/desbloquear
             localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
             loadAdminSlots(complex);
             if(currentActiveField === complex) updateSlotsView();
