@@ -51,6 +51,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
 
         .logo-area img {
@@ -92,18 +93,18 @@
 
         /* Contenedor Principal */
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 30px auto;
             padding: 0 20px;
         }
 
         .hero-title {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
         .hero-title h2 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
         }
 
@@ -113,10 +114,95 @@
 
         .hero-title p {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
 
-        /* Tarjetas y Formularios */
+        /* Cuadros / Secciones de Campos Deportivos */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .field-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .field-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px var(--neon-glow);
+        }
+
+        .field-info {
+            padding: 20px;
+        }
+
+        .field-info h3 {
+            color: var(--neon-green);
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .field-info p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .field-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 15px;
+        }
+
+        .field-price span {
+            color: var(--neon-green);
+        }
+
+        .btn-select-field {
+            width: 100%;
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .btn-select-field:hover {
+            background: var(--neon-green);
+            color: var(--bg-color);
+        }
+
+        /* Interfaz de Reserva (Oculta hasta seleccionar un campo) */
+        #bookingSection {
+            display: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--neon-green);
+            margin-bottom: 20px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -131,7 +217,7 @@
             margin-bottom: 20px;
             color: var(--neon-green);
             font-size: 1.3rem;
-            border-bottom: 1px solid rgba(255, 255, 102, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 10px;
         }
 
@@ -238,7 +324,7 @@
         }
 
         #yape-details img {
-            max-width: 180px;
+            max-width: 160px;
             border-radius: 8px;
             margin: 10px 0;
             border: 2px solid var(--neon-green);
@@ -344,7 +430,7 @@
 <body>
 
     <header>
-        <div class="logo-area">
+        <div class="logo-area" onclick="goHome()">
             <img src="logo.png.ico" alt="Logo">
             <h1>DeporHuacho <span>PRO</span></h1>
         </div>
@@ -352,60 +438,85 @@
     </header>
 
     <div class="container">
-        <div class="hero-title">
-            <h2>Reserva tu Cancha al <span>Instante</span></h2>
-            <p>Selecciona tu horario, asegura tu espacio con Yape/Plin o efectivo y juega sin complicaciones.</p>
+        <!-- VISTA INICIAL: SECCIÓN DE CAMPOS DEPORTIVOS -->
+        <div id="catalogSection">
+            <div class="hero-title">
+                <h2>Reserva tu Cancha en <span>Huacho</span></h2>
+                <p>Escoge tu complejo deportivo favorito, revisa los horarios y asegura tu partido al instante.</p>
+            </div>
+
+            <div class="fields-grid">
+                <!-- Cancha 1 -->
+                <div class="field-card">
+                    <div class="field-info">
+                        <h3>Cancha Sintética "El Triunfo"</h3>
+                        <p>Ubicación céntrica, iluminación LED nocturna y grass sintético de alta calidad.</p>
+                        <div class="field-price">Precio: <span>S/ 60</span> / hora</div>
+                    </div>
+                    <button class="btn-select-field" onclick="selectField('cancha1', 'Cancha Sintética \"El Triunfo\"')">Reservar Esta Cancha</button>
+                </div>
+
+                <!-- Cancha 2 -->
+                <div class="field-card">
+                    <div class="field-info">
+                        <h3>Complejo Deportivo "Los Crack"</h3>
+                        <p>Amplios espacios, tribunas cómodas y zona de vestuarios para tu equipo.</p>
+                        <div class="field-price">Precio: <span>S/ 60</span> / hora</div>
+                    </div>
+                    <button class="btn-select-field" onclick="selectField('cancha2', 'Complejo Deportivo \"Los Crack\"')">Reservar Esta Cancha</button>
+                </div>
+            </div>
         </div>
 
-        <div class="card">
-            <h3>1. Selecciona tu Complejo y Horario</h3>
-            <div class="form-group">
-                <label>Complejo Deportivo:</label>
-                <select id="complexSelect" class="form-control" onchange="updateSlotsView()">
-                    <option value="cancha1">Cancha Sintética "El Triunfo" (Centro)</option>
-                    <option value="cancha2">Complejo Deportivo "Los Crack" (Huacho)</option>
-                </select>
-            </div>
+        <!-- VISTA DE RESERVA (Se abre al hacer clic en un campo) -->
+        <div id="bookingSection">
+            <a class="back-link" onclick="goHome()">← Volver a la lista de canchas</a>
             
-            <label style="margin-bottom: 8px; display: block; color: var(--text-muted);">Horarios Disponibles (S/ 60 por hora):</label>
-            <div class="slots-grid" id="slotsGrid">
-                <!-- Horarios generados por script -->
-            </div>
-        </div>
-
-        <div class="card">
-            <h3>2. Tus Datos de Contacto</h3>
-            <div class="form-group">
-                <label>Nombre y Apellido:</label>
-                <input type="text" id="clientName" class="form-control" placeholder="Ej. José Pérez">
-            </div>
-            <div class="form-group">
-                <label>Número de Celular / WhatsApp:</label>
-                <input type="tel" id="clientPhone" class="form-control" placeholder="Ej. 923217323">
-            </div>
-        </div>
-
-        <div class="card">
-            <h3>3. Método de Pago</h3>
-            <div class="payment-options">
-                <div class="pay-option" id="opt-yape" onclick="selectPayment('yape')">📱 Yape / Plin</div>
-                <div class="pay-option" id="opt-cash" onclick="selectPayment('cash')">💵 Pago en Efectivo</div>
+            <div class="hero-title" style="margin-bottom: 20px;">
+                <h2 id="selectedFieldTitle">Reservando Cancha</h2>
+                <p>Selecciona tu hora, completa tus datos y adjunta tu pago.</p>
             </div>
 
-            <div id="yape-details">
-                <p>Escanea el QR o yapea al número del complejo:</p>
-                <h4 style="color: var(--neon-green); margin: 5px 0;" id="ownerPhoneDisplay">999 999 999</h4>
-                <!-- Imagen QR genérica o de muestra -->
-                <div style="background: white; padding: 10px; display: inline-block; border-radius: 8px;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YapeDeporHuacho" alt="QR Yape">
-                </div>
-                <div class="form-group" style="margin-top: 15px; text-align: left;">
-                    <label>Adjunta la captura de tu comprobante de pago:</label>
-                    <input type="file" id="voucherFile" class="form-control" accept="image/*">
+            <div class="card">
+                <h3>1. Horarios Disponibles (S/ 60)</h3>
+                <div class="slots-grid" id="slotsGrid">
+                    <!-- Horarios generados por script -->
                 </div>
             </div>
 
-            <button class="btn-main" onclick="confirmReservation()">🚀 Confirmar y Enviar Reserva</button>
+            <div class="card">
+                <h3>2. Tus Datos de Contacto</h3>
+                <div class="form-group">
+                    <label>Nombre y Apellido:</label>
+                    <input type="text" id="clientName" class="form-control" placeholder="Ej. José Pérez">
+                </div>
+                <div class="form-group">
+                    <label>Número de Celular / WhatsApp:</label>
+                    <input type="tel" id="clientPhone" class="form-control" placeholder="Ej. 923217323">
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>3. Método de Pago</h3>
+                <div class="payment-options">
+                    <div class="pay-option" id="opt-yape" onclick="selectPayment('yape')">📱 Yape / Plin</div>
+                    <div class="pay-option" id="opt-cash" onclick="selectPayment('cash')">💵 Pago en Efectivo</div>
+                </div>
+
+                <div id="yape-details">
+                    <p>Yapea al número del complejo:</p>
+                    <h4 style="color: var(--neon-green); margin: 5px 0;" id="ownerPhoneDisplay">999 999 999</h4>
+                    <div style="background: white; padding: 10px; display: inline-block; border-radius: 8px;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YapeDeporHuacho" alt="QR Yape">
+                    </div>
+                    <div class="form-group" style="margin-top: 15px; text-align: left;">
+                        <label>Adjunta la captura de tu comprobante de pago:</label>
+                        <input type="file" id="voucherFile" class="form-control" accept="image/*">
+                    </div>
+                </div>
+
+                <button class="btn-main" onclick="confirmReservation()">🚀 Confirmar y Enviar Reserva al WhatsApp</button>
+            </div>
         </div>
     </div>
 
@@ -439,14 +550,13 @@
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
                 <label style="color: var(--text-muted); margin-bottom: 8px; display: block;">Bloquear / Desbloquear Horarios:</label>
                 <div id="adminSlotsList" style="max-height: 200px; overflow-y: auto;">
-                    <!-- Lista de control de horarios -->
+                    <!-- Lista de control -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuración inicial de datos almacenados en el navegador (LocalStorage)
         const defaultHours = ["03:00 PM - 04:00 PM", "04:00 PM - 05:00 PM", "05:00 PM - 06:00 PM", "06:00 PM - 07:00 PM", "07:00 PM - 08:00 PM", "08:00 PM - 09:00 PM"];
         
         let dbData = JSON.parse(localStorage.getItem('deporhuacho_db')) || {
@@ -454,20 +564,43 @@
             cancha2: { phone: "987654321", blocked: [] }
         };
 
+        let currentActiveField = null;
         let selectedSlot = null;
         let selectedPaymentType = null;
 
-        function initApp() {
+        function selectField(fieldKey, fieldName) {
+            currentActiveField = fieldKey;
+            selectedSlot = null;
+            selectedPaymentType = null;
+            
+            document.getElementById('selectedFieldTitle').innerText = fieldName;
+            document.getElementById('catalogSection').style.display = 'none';
+            document.getElementById('bookingSection').style.display = 'block';
+            
+            // Limpiar campos de texto previos
+            document.getElementById('clientName').value = '';
+            document.getElementById('clientPhone').value = '';
+            document.getElementById('yape-details').style.display = 'none';
+            document.querySelectorAll('.pay-option').forEach(el => el.classList.remove('selected'));
+            
             updateSlotsView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goHome() {
+            currentActiveField = null;
+            document.getElementById('bookingSection').style.display = 'none';
+            document.getElementById('catalogSection').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function updateSlotsView() {
-            const complex = document.getElementById('complexSelect').value;
+            if(!currentActiveField) return;
             const grid = document.getElementById('slotsGrid');
             grid.innerHTML = '';
             
-            const currentBlocked = dbData[complex].blocked || [];
-            document.getElementById('ownerPhoneDisplay').innerText = dbData[complex].phone;
+            const currentBlocked = dbData[currentActiveField].blocked || [];
+            document.getElementById('ownerPhoneDisplay').innerText = dbData[currentActiveField].phone;
 
             defaultHours.forEach(hour => {
                 const btn = document.createElement('button');
@@ -508,7 +641,6 @@
         }
 
         function confirmReservation() {
-            const complex = document.getElementById('complexSelect').value;
             const name = document.getElementById('clientName').value.trim();
             const phone = document.getElementById('clientPhone').value.trim();
 
@@ -533,22 +665,22 @@
                 }
             }
 
-            // Bloquear el horario automáticamente
-            if(!dbData[complex].blocked.includes(selectedSlot)) {
-                dbData[complex].blocked.push(selectedSlot);
+            // Bloquear el horario en la base de datos local
+            if(!dbData[currentActiveField].blocked.includes(selectedSlot)) {
+                dbData[currentActiveField].blocked.push(selectedSlot);
                 localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
             }
 
-            // Enviar mensaje a WhatsApp del dueño
-            const ownerPhone = dbData[complex].phone;
+            const ownerPhone = dbData[currentActiveField].phone;
+            const fieldNameText = document.getElementById('selectedFieldTitle').innerText;
             const paymentText = selectedPaymentType === 'yape' ? 'Yape/Plin (Comprobante adjuntado)' : 'Pago en Efectivo en local';
             
-            const message = `⚽ *¡NUEVA RESERVA WEB!* ⚽%0A%0A*Cliente:* ${name}%0A*Teléfono:* ${phone}%0A*Horario:* ${selectedSlot}%0A*Método de pago:* ${paymentText}%0A%0A*Estado:* Horario bloqueado automáticamente en el sistema.`;
+            const message = `⚽ *¡NUEVA RESERVA WEB!* ⚽%0A%0A*Cancha:* ${fieldNameText}%0A*Cliente:* ${name}%0A*Teléfono:* ${phone}%0A*Horario:* ${selectedSlot}%0A*Método de pago:* ${paymentText}%0A%0A*Estado:* Horario bloqueado automáticamente.`;
             
             window.open(`https://wa.me/51${ownerPhone}?text=${message}`, '_blank');
             
             alert("¡Reserva procesada con éxito! Redirigiendo al WhatsApp del complejo...");
-            location.reload();
+            goHome();
         }
 
         // Lógica del Panel Dueño
@@ -567,7 +699,6 @@
             const complex = document.getElementById('adminComplex').value;
             const pin = document.getElementById('adminPin').value;
 
-            // Clave maestra secreta única (puedes cambiarla aquí, ej: "huacho2026")
             if(pin === "1234") {
                 document.getElementById('adminLoginSection').style.display = 'none';
                 document.getElementById('adminPanelSection').style.display = 'block';
@@ -616,10 +747,8 @@
             }
             localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
             loadAdminSlots(complex);
-            updateSlotsView();
+            if(currentActiveField === complex) updateSlotsView();
         }
-
-        window.onload = initApp;
     </script>
 </body>
 </html>
