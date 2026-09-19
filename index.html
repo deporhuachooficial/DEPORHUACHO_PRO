@@ -537,7 +537,6 @@
             color: var(--bg-color);
         }
 
-        /* Tarjeta de Reservas Registradas en el Panel */
         .admin-booking-item {
             background: rgba(0, 255, 102, 0.05);
             border: 1px solid var(--border-color);
@@ -571,7 +570,6 @@
     <div class="container">
         <!-- VISTA INICIAL: CATÁLOGO DE CANCHAS Y BIENVENIDA -->
         <div id="catalogSection">
-            <!-- SECCIÓN DE BIENVENIDA LLAMATIVA -->
             <div class="hero-welcome">
                 <div class="welcome-badge">⚡ Plataforma Oficial de Reservas ⚡</div>
                 <h2>Bienvenido a <span>DeporHuacho</span></h2>
@@ -593,7 +591,6 @@
                 </div>
             </div>
 
-            <!-- TÍTULO SEPARADOR DE CAMPOS -->
             <div class="section-header">
                 <h3>Elige tu Cancha Deportiva</h3>
                 <div class="section-line"></div>
@@ -632,7 +629,7 @@
             </div>
         </div>
 
-        <!-- VISTA DE RESERVA (Se activa al presionar un campo) -->
+        <!-- VISTA DE RESERVA -->
         <div id="bookingSection">
             <a class="back-link" onclick="goHome()">← Volver al catálogo de canchas</a>
             
@@ -643,9 +640,7 @@
 
             <div class="card">
                 <h3>1. Horarios Disponibles (S/ 60 la hora)</h3>
-                <div class="slots-grid" id="slotsGrid">
-                    <!-- Horarios dinámicos -->
-                </div>
+                <div class="slots-grid" id="slotsGrid"></div>
             </div>
 
             <div class="card">
@@ -693,7 +688,7 @@
             <div id="adminLoginSection">
                 <div class="form-group">
                     <label>Selecciona tu Cancha:</label>
-                    <select id="adminComplex" class="form-control">
+                    <select id="adminComplex" class="form-control" onchange="onAdminComplexChange()">
                         <option value="cancha1">Cancha "El Triunfo"</option>
                         <option value="cancha2">Cancha "Los Crack"</option>
                     </select>
@@ -707,24 +702,20 @@
 
             <div id="adminPanelSection" class="admin-panel-content">
                 <div class="form-group">
-                    <label>Modificar mi número de WhatsApp:</label>
-                    <input type="text" id="adminNewPhone" class="form-control" value="999999999">
-                    <button class="admin-btn" style="width: 100%; margin-top: 8px;" onclick="saveOwnerPhone()">Actualizar Número</button>
+                    <label>Modificar mi número de WhatsApp (<span id="currentEditingComplexName" style="color:var(--neon-green)">Cancha</span>):</label>
+                    <input type="text" id="adminNewPhone" class="form-control">
+                    <button class="admin-btn" style="width: 100%; margin-top: 8px;" onclick="saveOwnerPhone()">💾 Guardar Número de WhatsApp</button>
                 </div>
                 
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
                 
                 <h4 style="color: var(--neon-green); margin-bottom: 10px; font-size: 1rem;">📋 Reservas Registradas de Clientes:</h4>
-                <div id="adminBookingsList" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px;">
-                    <!-- Se listan las reservas aquí -->
-                </div>
+                <div id="adminBookingsList" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px;"></div>
 
                 <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
                 
                 <label style="color: var(--text-muted); margin-bottom: 8px; display: block;">Bloquear / Desbloquear Horarios:</label>
-                <div id="adminSlotsList" style="max-height: 180px; overflow-y: auto;">
-                    <!-- Lista de control de horarios -->
-                </div>
+                <div id="adminSlotsList" style="max-height: 180px; overflow-y: auto;"></div>
             </div>
         </div>
     </div>
@@ -732,10 +723,14 @@
     <script>
         const defaultHours = ["03:00 PM - 04:00 PM", "04:00 PM - 05:00 PM", "05:00 PM - 06:00 PM", "06:00 PM - 07:00 PM", "07:00 PM - 08:00 PM", "08:00 PM - 09:00 PM"];
         
-        let dbData = JSON.parse(localStorage.getItem('deporhuacho_db')) || {
-            cancha1: { phone: "923217323", blocked: [], bookings: [] },
-            cancha2: { phone: "987654321", blocked: [], bookings: [] }
+        // Base de datos inicial precargada
+        let defaultDb = {
+            cancha1: { name: "Cancha Sintética El Triunfo", phone: "923217323", blocked: [], bookings: [] },
+            cancha2: { name: "Complejo Deportivo Los Crack", phone: "987654321", blocked: [], bookings: [] }
         };
+
+        // Cargar desde localStorage o inicializar
+        let dbData = JSON.parse(localStorage.getItem('deporhuacho_db')) || defaultDb;
 
         let currentActiveField = null;
         let selectedSlot = null;
@@ -841,11 +836,11 @@
                 dbData[currentActiveField].blocked.push(selectedSlot);
             }
 
-            // Guardar detalles de la reserva para el panel del dueño
             const paymentText = selectedPaymentType === 'yape' ? 'Yape/Plin (Con comprobante)' : 'Pago en Efectivo';
             if(!dbData[currentActiveField].bookings) {
                 dbData[currentActiveField].bookings = [];
             }
+            
             dbData[currentActiveField].bookings.push({
                 name: name,
                 phone: phone,
@@ -854,6 +849,7 @@
                 date: new Date().toLocaleDateString()
             });
 
+            // Guardar permanentemente en LocalStorage
             localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
 
             const ownerPhone = dbData[currentActiveField].phone;
@@ -870,6 +866,7 @@
         // Lógica del Panel Dueño
         function openAdminModal() {
             document.getElementById('adminModal').style.display = 'flex';
+            onAdminComplexChange();
         }
 
         function closeAdminModal() {
@@ -879,17 +876,22 @@
             document.getElementById('adminPanelSection').style.display = 'none';
         }
 
-        function verifyAdmin() {
+        function onAdminComplexChange() {
             const complex = document.getElementById('adminComplex').value;
+            document.getElementById('currentEditingComplexName').innerText = dbData[complex].name;
+            document.getElementById('adminNewPhone').value = dbData[complex].phone;
+        }
+
+        function verifyAdmin() {
             const pin = document.getElementById('adminPin').value;
 
             if(pin === "1234") {
                 document.getElementById('adminLoginSection').style.display = 'none';
                 document.getElementById('adminPanelSection').style.display = 'block';
-                document.getElementById('adminNewPhone').value = dbData[complex].phone;
+                const complex = document.getElementById('adminComplex').value;
                 loadAdminDashboard(complex);
             } else {
-                alert("Código PIN incorrecto.");
+                alert("Código PIN incorrecto. Intenta nuevamente.");
             }
         }
 
@@ -898,12 +900,16 @@
             const newPhone = document.getElementById('adminNewPhone').value.trim();
             if(newPhone) {
                 dbData[complex].phone = newPhone;
+                // Guardado inmediato y persistente
                 localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
-                alert("¡Número de WhatsApp actualizado correctamente!");
+                alert("¡Número de WhatsApp actualizado y guardado correctamente!");
+            } else {
+                alert("Por favor ingresa un número válido.");
             }
         }
 
         function loadAdminDashboard(complex) {
+            onAdminComplexChange();
             loadAdminBookings(complex);
             loadAdminSlots(complex);
         }
@@ -957,6 +963,7 @@
             } else {
                 dbData[complex].blocked.push(hour);
             }
+            // Guardado inmediato y persistente al bloquear/desbloquear
             localStorage.setItem('deporhuacho_db', JSON.stringify(dbData));
             loadAdminSlots(complex);
             if(currentActiveField === complex) updateSlotsView();
